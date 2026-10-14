@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Acceso al panel de administración de Pan Clásico.">
+    <title>Acceso Admin | Pan Clásico</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body class="login-body">
+
+    <!-- Encabezado sutil -->
+    <header>
+        <nav class="navbar" style="justify-content: center;">
+            <div class="logo">
+                🥖 Pan Clásico
+            </div>
+        </nav>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="login-main">
+        <div class="login-card">
+            
+            <span class="login-badge">Acceso Administrativo</span>
+            <h1>Panel de Control</h1>
+            <p class="subtexto">Gestiona productos, pedidos de clientes y mensajes recibidos.</p>
+
+            <!-- Caja de Mensaje de Error / Éxito -->
+            <div id="login-alerta" class="login-alerta" role="alert"></div>
+
+            <form id="form-login" class="login-form">
+                
+                <div class="login-campo">
+                    <label for="usuario">Usuario Administrador</label>
+                    <div class="login-input-wrap">
+                        <input 
+                            type="text" 
+                            id="usuario" 
+                            name="usuario" 
+                            placeholder="admin" 
+                            autocomplete="username" 
+                            required 
+                            autofocus
+                        >
+                    </div>
+                </div>
+
+                <div class="login-campo">
+                    <label for="password">Contraseña</label>
+                    <div class="login-input-wrap">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            placeholder="••••••••" 
+                            autocomplete="current-password" 
+                            required
+                        >
+                        <button type="button" id="btn-toggle-pass" class="btn-toggle-pass" aria-label="Mostrar u ocultar contraseña">👁️</button>
+                    </div>
+                </div>
+
+                <button type="submit" id="btn-submit" class="boton btn-login">
+                    Iniciar Sesión
+                </button>
+
+            </form>
+
+            <div class="login-demo-box">
+                Credenciales por defecto: <strong>admin</strong> | Clave: <strong>admin123</strong>
+            </div>
+
+            <a href="index.html" class="enlace-volver">
+                ← Volver a la panadería
+            </a>
+
+        </div>
+    </main>
+
+    <!-- Pie de página -->
+    <footer>
+        <p>© 2026 Pan Clásico - Todos los derechos reservados | Panel Administrativo</p>
+    </footer>
+
+    <!-- Script de autenticación -->
+    <script>
+        const API_LOGIN_URL = '../php/login.php';
+
+        const formLogin = document.getElementById('form-login');
+        const alerta = document.getElementById('login-alerta');
+        const btnSubmit = document.getElementById('btn-submit');
+        const btnTogglePass = document.getElementById('btn-toggle-pass');
+        const inputPassword = document.getElementById('password');
+
+        // Mostrar / Ocultar contraseña
+        btnTogglePass.addEventListener('click', () => {
+            const esPassword = inputPassword.type === 'password';
+            inputPassword.type = esPassword ? 'text' : 'password';
+            btnTogglePass.textContent = esPassword ? '🙈' : '👁️';
+        });
+
+        function mostrarAlerta(mensaje, esError = true) {
+            alerta.textContent = mensaje;
+            alerta.className = `login-alerta ${esError ? 'login-alerta-error' : 'login-alerta-exito'}`;
+            alerta.style.display = 'block';
+        }
+
+        function ocultarAlerta() {
+            alerta.style.display = 'none';
+        }
+
+        // Verificar si ya existe una sesión activa al entrar
+        async function verificarSesionExistente() {
+            try {
+                const resp = await fetch(API_LOGIN_URL);
+                if (resp.ok) {
+                    const data = await resp.json();
+                    if (data.ok && data.autenticado) {
+                        // Ya está logueado, redirigir directo al admin
+                        window.location.replace('admin.html');
+                    }
+                }
+            } catch (e) {
+                // Si la API falla, el usuario puede intentar iniciar sesión normalmente
+                console.log('Verificación inicial de sesión finalizada.');
+            }
+        }
+        verificarSesionExistente();
+
+        // Procesar submit
+        formLogin.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            ocultarAlerta();
+
+            const usuario = document.getElementById('usuario').value.trim();
+            const password = inputPassword.value;
+
+            if (!usuario || !password) {
+                mostrarAlerta('Por favor completa todos los campos.');
+                return;
+            }
+
+            const textoOriginal = btnSubmit.innerHTML;
+            btnSubmit.innerHTML = '⏳ Entrando...';
+            btnSubmit.disabled = true;
+
+            try {
+                const resp = await fetch(API_LOGIN_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ usuario, password })
+                });
+
+                const data = await resp.json();
+
+                if (resp.ok && data.ok) {
+                    mostrarAlerta(`¡Bienvenido, ${data.usuario || 'Admin'}! Redirigiendo...`, false);
+                    setTimeout(() => {
+                        window.location.href = 'admin.html';
+                    }, 800);
+                } else {
+                    mostrarAlerta(data.error || 'Credenciales incorrectas. Intenta nuevamente.');
+                    btnSubmit.innerHTML = textoOriginal;
+                    btnSubmit.disabled = false;
+                }
+
+            } catch (err) {
+                console.error('Error de red al iniciar sesión:', err);
+                mostrarAlerta('Error de conexión con el servidor. Verifica que Apache y MySQL estén encendidos.');
+                btnSubmit.innerHTML = textoOriginal;
+                btnSubmit.disabled = false;
+            }
+        });
+    </script>
+
+</body>
+
+</html>

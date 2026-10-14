@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Ponte en contacto con Pan Clásico. Haz tus pedidos especiales o déjanos tus dudas y sugerencias.">
+    <title>Contacto | Pan Clásico</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+    <!-- ==================== NAVEGACIÓN ==================== -->
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                🥖 Pan Clásico
+            </div>
+
+            <ul class="menu">
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="catalogo.html">Catálogo</a></li>
+                <li><a href="contacto.html" class="activo">Contacto</a></li>
+                <li><a href="login.html">Login</a></li>
+                <li>
+                    <a href="carrito.html" class="nav-cart-link" aria-label="Carrito de compras">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L21 7H6"/>
+                            <circle cx="10" cy="20" r="1"/>
+                            <circle cx="18" cy="20" r="1"/>
+                        </svg>
+                        <span class="cart-badge">0</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- ==================== CONTACTO ==================== -->
+    <main>
+        <section class="contacto">
+
+            <div class="contacto-info">
+                <span class="subtitulo">PONTE EN CONTACTO</span>
+                <h1>Contáctanos</h1>
+                <p>
+                    ¿Tienes dudas, sugerencias o deseas cotizar pedidos para eventos especiales? Escríbenos y nuestro equipo de panaderos te atenderá con gusto.
+                </p>
+
+                <div class="dato">
+                    <span>📍</span>
+                    <p>Pan Clásico — Panadería Tradicional</p>
+                </div>
+
+                <div class="dato">
+                    <span>📧</span>
+                    <p></p>
+                </div>
+
+                <div class="dato">
+                    <span>🕒</span>
+                    <p>Lunes a Sabado : 5:00 AM - 11:00 PM <br>Domigo 5:00 AM - 7:00 PM</p>
+                </div>
+            </div> 
+
+            <!-- FORMULARIO -->
+            <div class="formulario">
+                <form id="form-contacto">
+                    <label for="nombre">Nombre completo *</label>
+                    <input
+                        type="text"
+                        id="nombre"
+                        name="nombre"
+                        placeholder="Escribe tu nombre"
+                        required
+                    >
+
+                    <label for="correo">Correo electrónico *</label>
+                    <input
+                        type="email"
+                        id="correo"
+                        name="correo"
+                        placeholder="ejemplo@correo.com"
+                        required
+                    >
+
+                    <label for="mensaje">Mensaje *</label>
+                    <textarea
+                        id="mensaje"
+                        name="mensaje"
+                        rows="6"
+                        placeholder="¿En qué podemos ayudarte? Cuéntanos..."
+                        required
+                    ></textarea>
+
+                    <button type="submit" class="boton btn-enviar-contacto">
+                        ✉️ Enviar mensaje
+                    </button>
+                </form>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Contenedor Flotante para Notificaciones Toast -->
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+    <!-- ==================== PIE DE PÁGINA ==================== -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">🥖 Pan Clásico</div>
+            <p class="footer-copy">© 2026 Pan Clásico - Tradición y sabor recién horneado cada mañana.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/badge.js"></script>
+    <script src="js/contacto.js"></script>
+
+</body>
+</html>
