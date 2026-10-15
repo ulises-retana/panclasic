@@ -120,7 +120,7 @@
                     const data = await resp.json();
                     if (data.ok && data.autenticado) {
                         // Ya está logueado, redirigir directo al admin
-                        window.location.replace('admin.html');
+                        window.location.replace('admin/index.html');
                     }
                 }
             } catch (e) {
@@ -161,7 +161,7 @@
                 if (resp.ok && data.ok) {
                     mostrarAlerta(`¡Bienvenido, ${data.usuario || 'Admin'}! Redirigiendo...`, false);
                     setTimeout(() => {
-                        window.location.href = 'admin.html';
+                        window.location.href = 'admin/index.html';
                     }, 800);
                 } else {
                     mostrarAlerta(data.error || 'Credenciales incorrectas. Intenta nuevamente.');

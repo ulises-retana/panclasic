@@ -1,185 +1,160 @@
 <?php
-// ============================================
-// Pan Clásico — API de Productos
-// ============================================
-// Endpoints:
-//   GET    productos.php              → Listar todos los productos activos
-//   GET    productos.php?id=1         → Obtener un producto por ID
-//   POST   productos.php              → Agregar un producto nuevo (admin)
-//   PUT    productos.php?id=1         → Editar un producto (admin)
-//   DELETE productos.php?id=1         → Eliminar/desactivar un producto (admin)
-// ============================================
-
 require_once __DIR__ . '/config/db.php';
+require_once __DIR__ . '/includes/auth.php';
 
-$metodo = $_SERVER['REQUEST_METHOD'];
+function validarProducto(array $datos, bool $completo = true): array
+{
+    $permitidos = ['nombre', 'precio', 'unidad', 'descripcion', 'imagen', 'stock', 'categoria', 'activo'];
+    $resultado = [];
+    foreach ($permitidos as $campo) {
+        if (array_key_exists($campo, $datos)) {
+            $resultado[$campo] = $datos[$campo];
+        }
+    }
+    if ($completo && (!isset($resultado['nombre']) || !array_key_exists('precio', $resultado))) {
+        fallar(400, 'Nombre y precio son obligatorios.');
+    }
+    if (array_key_exists('nombre', $resultado)
+        && (!is_string($resultado['nombre']) || trim($resultado['nombre']) === '' || strlen(trim($resultado['nombre'])) > 150)) {
+        fallar(400, 'El nombre es obligatorio y no puede superar 150 caracteres.');
+    }
+    if (array_key_exists('precio', $resultado)
+        && (!is_numeric($resultado['precio']) || (float) $resultado['precio'] < 0)) {
+        fallar(400, 'El precio debe ser un número mayor o igual a cero.');
+    }
+    if (array_key_exists('stock', $resultado)
+        && (filter_var($resultado['stock'], FILTER_VALIDATE_INT) === false || (int) $resultado['stock'] < 0)) {
+        fallar(400, 'El stock debe ser un entero mayor o igual a cero.');
+    }
+    if (array_key_exists('activo', $resultado)
+        && !in_array((string) $resultado['activo'], ['0', '1'], true)) {
+        fallar(400, 'El estado del producto no es válido.');
+    }
+    foreach (['unidad' => 50, 'descripcion' => 5000, 'imagen' => 255, 'categoria' => 100] as $campo => $maximo) {
+        if (isset($resultado[$campo]) && (!is_string($resultado[$campo]) || strlen($resultado[$campo]) > $maximo)) {
+            fallar(400, "El campo {$campo} supera la longitud permitida.");
+        }
+    }
+    if (isset($resultado['nombre'])) {
+        $resultado['nombre'] = trim($resultado['nombre']);
+    }
+    if (isset($resultado['precio'])) {
+        $resultado['precio'] = number_format((float) $resultado['precio'], 2, '.', '');
+    }
+    if (isset($resultado['stock'])) {
+        $resultado['stock'] = (int) $resultado['stock'];
+    }
+    if (isset($resultado['activo'])) {
+        $resultado['activo'] = (int) $resultado['activo'];
+    }
+    return $resultado;
+}
 
-switch ($metodo) {
-
-    // ========================================
-    // GET — Listar productos
-    // ========================================
+switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
+        $todos = ($_GET['todos'] ?? '') === '1';
+        if ($todos) {
+            requerir_rol('admin');
+        }
         try {
-            // Si viene ?id=X, devolver un solo producto
             if (isset($_GET['id'])) {
-                $stmt = $pdo->prepare('SELECT * FROM productos WHERE id = :id');
-                $stmt->execute([':id' => (int) $_GET['id']]);
+                $stmt = $pdo->prepare($todos
+                    ? 'SELECT * FROM productos WHERE id = :id'
+                    : 'SELECT * FROM productos WHERE id = :id AND activo = 1');
+                $stmt->execute([':id' => filter_var($_GET['id'], FILTER_VALIDATE_INT) ?: 0]);
                 $producto = $stmt->fetch();
-
-                if ($producto) {
-                    echo json_encode(['ok' => true, 'producto' => $producto]);
-                } else {
-                    http_response_code(404);
-                    echo json_encode(['ok' => false, 'error' => 'Producto no encontrado.']);
+                if (!$producto) {
+                    fallar(404, 'Producto no encontrado.');
                 }
+                echo json_encode(['ok' => true, 'producto' => $producto], JSON_UNESCAPED_UNICODE);
             } else {
-                // Listar todos los activos (para el catálogo público)
-                // Si viene ?todos=1, listar incluso los inactivos (para admin)
-                if (isset($_GET['todos']) && $_GET['todos'] == '1') {
-                    $stmt = $pdo->query('SELECT * FROM productos ORDER BY id DESC');
-                } else {
-                    $stmt = $pdo->query('SELECT * FROM productos WHERE activo = 1 ORDER BY id DESC');
-                }
-                $productos = $stmt->fetchAll();
-                echo json_encode(['ok' => true, 'productos' => $productos]);
+                $sql = $todos
+                    ? 'SELECT * FROM productos ORDER BY id DESC'
+                    : 'SELECT * FROM productos WHERE activo = 1 ORDER BY id DESC';
+                echo json_encode(['ok' => true, 'productos' => $pdo->query($sql)->fetchAll()], JSON_UNESCAPED_UNICODE);
             }
         } catch (PDOException $e) {
-            http_response_code(500);
-            echo json_encode(['ok' => false, 'error' => 'Error al consultar productos.']);
+            fallar(500, 'Error al consultar productos.');
         }
         break;
 
-    // ========================================
-    // POST — Agregar producto nuevo
-    // ========================================
     case 'POST':
+        requerir_rol('admin');
+        $datos = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($datos)) {
+            fallar(400, 'Cuerpo JSON inválido.');
+        }
+        $datos = validarProducto($datos);
+        $datos += ['unidad' => 'pieza', 'descripcion' => null, 'imagen' => null, 'stock' => 0, 'categoria' => 'pan', 'activo' => 1];
         try {
-            // Leer datos del body (JSON)
-            $datos = json_decode(file_get_contents('php://input'), true);
-
-            // Validar campos obligatorios
-            if (empty($datos['nombre']) || !isset($datos['precio'])) {
-                http_response_code(400);
-                echo json_encode(['ok' => false, 'error' => 'Nombre y precio son obligatorios.']);
-                exit();
-            }
-
-            $stmt = $pdo->prepare('
-                INSERT INTO productos (nombre, precio, unidad, descripcion, imagen, stock, categoria, activo)
-                VALUES (:nombre, :precio, :unidad, :descripcion, :imagen, :stock, :categoria, :activo)
-            ');
-
-            $stmt->execute([
-                ':nombre'      => $datos['nombre'],
-                ':precio'      => (float) $datos['precio'],
-                ':unidad'      => $datos['unidad']       ?? 'pieza',
-                ':descripcion' => $datos['descripcion']  ?? null,
-                ':imagen'      => $datos['imagen']       ?? null,
-                ':stock'       => (int) ($datos['stock'] ?? 0),
-                ':categoria'   => $datos['categoria']    ?? 'pan',
-                ':activo'      => (int) ($datos['activo'] ?? 1),
-            ]);
-
-            $nuevoId = $pdo->lastInsertId();
-
+            $stmt = $pdo->prepare('INSERT INTO productos (nombre, precio, unidad, descripcion, imagen, stock, categoria, activo)
+                VALUES (:nombre, :precio, :unidad, :descripcion, :imagen, :stock, :categoria, :activo)');
+            $stmt->execute(array_combine(
+                array_map(static fn($key) => ':' . $key, array_keys($datos)),
+                array_values($datos)
+            ));
             http_response_code(201);
-            echo json_encode([
-                'ok'      => true,
-                'mensaje' => 'Producto creado exitosamente.',
-                'id'      => (int) $nuevoId,
-            ]);
-
+            echo json_encode(['ok' => true, 'mensaje' => 'Producto creado.', 'id' => (int) $pdo->lastInsertId()]);
         } catch (PDOException $e) {
-            http_response_code(500);
-            echo json_encode(['ok' => false, 'error' => 'Error al crear el producto.']);
+            fallar(500, 'Error al crear el producto.');
         }
         break;
 
-    // ========================================
-    // PUT — Editar producto existente
-    // ========================================
     case 'PUT':
+        requerir_rol('admin');
+        $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+        $datos = json_decode(file_get_contents('php://input'), true);
+        if (!$id || !is_array($datos)) {
+            fallar(400, 'Indica un ID y datos JSON válidos.');
+        }
+        $datos = validarProducto($datos, false);
+        if (!$datos) {
+            fallar(400, 'No se enviaron campos para actualizar.');
+        }
+        $sets = [];
+        $params = [':id' => $id];
+        foreach ($datos as $campo => $valor) {
+            $sets[] = "{$campo} = :{$campo}";
+            $params[":{$campo}"] = $valor;
+        }
         try {
-            if (!isset($_GET['id'])) {
-                http_response_code(400);
-                echo json_encode(['ok' => false, 'error' => 'Se requiere el parámetro id.']);
-                exit();
-            }
-
-            $id = (int) $_GET['id'];
-            $datos = json_decode(file_get_contents('php://input'), true);
-
-            // Construir SET dinámicamente solo con los campos que se enviaron
-            $camposPermitidos = ['nombre', 'precio', 'unidad', 'descripcion', 'imagen', 'stock', 'categoria', 'activo'];
-            $sets = [];
-            $params = [':id' => $id];
-
-            foreach ($camposPermitidos as $campo) {
-                if (array_key_exists($campo, $datos)) {
-                    $sets[] = "$campo = :$campo";
-                    $params[":$campo"] = $datos[$campo];
+            $stmt = $pdo->prepare('UPDATE productos SET ' . implode(', ', $sets) . ' WHERE id = :id');
+            $stmt->execute($params);
+            if ($stmt->rowCount() === 0) {
+                $exists = $pdo->prepare('SELECT 1 FROM productos WHERE id = :id');
+                $exists->execute([':id' => $id]);
+                if (!$exists->fetchColumn()) {
+                    fallar(404, 'Producto no encontrado.');
                 }
             }
-
-            if (empty($sets)) {
-                http_response_code(400);
-                echo json_encode(['ok' => false, 'error' => 'No se enviaron campos para actualizar.']);
-                exit();
-            }
-
-            $sql = 'UPDATE productos SET ' . implode(', ', $sets) . ' WHERE id = :id';
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute($params);
-
-            if ($stmt->rowCount() > 0) {
-                echo json_encode(['ok' => true, 'mensaje' => 'Producto actualizado.']);
-            } else {
-                http_response_code(404);
-                echo json_encode(['ok' => false, 'error' => 'Producto no encontrado o sin cambios.']);
-            }
-
+            echo json_encode(['ok' => true, 'mensaje' => 'Producto actualizado.']);
         } catch (PDOException $e) {
-            http_response_code(500);
-            echo json_encode(['ok' => false, 'error' => 'Error al actualizar el producto.']);
+            fallar(500, 'Error al actualizar el producto.');
         }
         break;
 
-    // ========================================
-    // DELETE — Desactivar producto (soft delete)
-    // ========================================
     case 'DELETE':
+        requerir_rol('admin');
+        $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+        if (!$id) {
+            fallar(400, 'Se requiere un ID válido.');
+        }
         try {
-            if (!isset($_GET['id'])) {
-                http_response_code(400);
-                echo json_encode(['ok' => false, 'error' => 'Se requiere el parámetro id.']);
-                exit();
-            }
-
-            $id = (int) $_GET['id'];
-
-            // Soft delete: marcar como inactivo (no se borra de la BD)
             $stmt = $pdo->prepare('UPDATE productos SET activo = 0 WHERE id = :id');
             $stmt->execute([':id' => $id]);
-
-            if ($stmt->rowCount() > 0) {
-                echo json_encode(['ok' => true, 'mensaje' => 'Producto desactivado.']);
-            } else {
-                http_response_code(404);
-                echo json_encode(['ok' => false, 'error' => 'Producto no encontrado.']);
+            if ($stmt->rowCount() === 0) {
+                $exists = $pdo->prepare('SELECT 1 FROM productos WHERE id = :id');
+                $exists->execute([':id' => $id]);
+                if (!$exists->fetchColumn()) {
+                    fallar(404, 'Producto no encontrado.');
+                }
             }
-
+            echo json_encode(['ok' => true, 'mensaje' => 'Producto desactivado.']);
         } catch (PDOException $e) {
-            http_response_code(500);
-            echo json_encode(['ok' => false, 'error' => 'Error al eliminar el producto.']);
+            fallar(500, 'Error al desactivar el producto.');
         }
         break;
 
-    // ========================================
-    // Método no soportado
-    // ========================================
     default:
-        http_response_code(405);
-        echo json_encode(['ok' => false, 'error' => 'Método no permitido.']);
-        break;
+        fallar(405, 'Método no permitido.');
 }

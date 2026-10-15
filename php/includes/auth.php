@@ -1,22 +1,41 @@
 <?php
-// ============================================
-// Pan Clásico — Middleware de Autenticación
-// ============================================
-// Incluir al inicio de cualquier endpoint que requiera permisos de administrador:
-//   require_once __DIR__ . '/includes/auth.php';
-// ============================================
+declare(strict_types=1);
 
 if (session_status() === PHP_SESSION_NONE) {
+    session_set_cookie_params([
+        'httponly' => true,
+        'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+        'samesite' => 'Lax',
+    ]);
     session_start();
 }
 
-// Si no hay sesión activa de admin, rechazar petición
-if (empty($_SESSION['admin_id']) || empty($_SESSION['admin_usuario'])) {
-    http_response_code(401);
-    header('Content-Type: application/json; charset=utf-8');
-    echo json_encode([
-        'ok'    => false,
-        'error' => 'No autorizado. Debe iniciar sesión como administrador para realizar esta acción.'
-    ]);
-    exit();
+function usuario_actual(): ?array
+{
+    if (empty($_SESSION['usuario_id']) || empty($_SESSION['usuario_email'])) {
+        return null;
+    }
+
+    return [
+        'id' => (int) $_SESSION['usuario_id'],
+        'nombre' => (string) $_SESSION['usuario_nombre'],
+        'email' => (string) $_SESSION['usuario_email'],
+        'rol' => (string) $_SESSION['usuario_rol'],
+    ];
+}
+
+function es_admin(): bool
+{
+    return (usuario_actual()['rol'] ?? null) === 'admin';
+}
+
+function requerir_rol(string $rol): void
+{
+    $usuario = usuario_actual();
+    if (!$usuario) {
+        fallar(401, 'Debes iniciar sesión para realizar esta acción.');
+    }
+    if ($rol === 'admin' && !es_admin()) {
+        fallar(403, 'No tienes permisos para realizar esta acción.');
+    }
 }

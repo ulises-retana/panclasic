@@ -4,269 +4,210 @@
 // ============================================
 // Endpoints:
 //   POST php/compras.php          → Registrar compra + descontar stock (transaccional)
-//   GET  php/compras.php          → Listar historial de compras (admin)
-//   GET  php/compras.php?id=1     → Obtener compra específica con su detalle (admin)
+//   GET  php/compras.php          → Historial de compras (solo admin)
+//   GET  php/compras.php?id=1     → Una compra con su detalle (solo admin)
 // ============================================
 
 require_once __DIR__ . '/config/db.php';
+require_once __DIR__ . '/includes/auth.php';
 
-$metodo = $_SERVER['REQUEST_METHOD'];
+// --------------------------------------------
+// POST: validar la petición y registrar el pedido
+// --------------------------------------------
 
-switch ($metodo) {
+/**
+ * Lee y valida el JSON recibido. Devuelve:
+ *   cliente, telefono, direccion, metodo_pago,
+ *   cantidades → [id_producto => cantidad], con las líneas repetidas ya sumadas
+ */
+function leerPedido(): array
+{
+    $datos = json_decode(file_get_contents('php://input'), true);
 
-    // ========================================
-    // POST — Registrar nueva compra
-    // ========================================
+    if (!is_array($datos)) {
+        fallar(400, 'Cuerpo de solicitud JSON inválido.');
+    }
+
+    // --- Datos del cliente (los límites coinciden con las columnas de la tabla) ---
+    $cliente   = is_string($datos['nombre_cliente'] ?? null) ? trim($datos['nombre_cliente']) : '';
+    $telefono  = is_string($datos['telefono'] ?? null) ? trim($datos['telefono']) : '';
+    $direccion = is_string($datos['direccion'] ?? null) ? trim($datos['direccion']) : '';
+
+    if ($cliente === '' || strlen($cliente) > 150) {
+        fallar(400, 'El nombre del cliente es obligatorio (máximo 150 caracteres).');
+    }
+    if ($direccion === '' || strlen($direccion) > 500) {
+        fallar(400, 'La dirección de entrega es obligatoria (máximo 500 caracteres).');
+    }
+    if (strlen($telefono) > 20) {
+        fallar(400, 'El teléfono no puede superar los 20 caracteres.');
+    }
+
+    // --- Método de pago ---
+    $metodoPago = $datos['metodo_pago'] ?? 'efectivo';
+    if ($metodoPago !== 'efectivo') {
+        fallar(400, 'Por ahora solo aceptamos pago en efectivo al recibir.');
+    }
+
+    // --- Productos: se suman las líneas repetidas para validar el stock real ---
+    $productos  = is_array($datos['productos'] ?? null) ? $datos['productos'] : [];
+    $cantidades = [];
+
+    foreach ($productos as $item) {
+        $item     = is_array($item) ? $item : [];
+        $id       = (int) ($item['id'] ?? 0);
+        $cantidad = (int) ($item['cantidad'] ?? 0);
+
+        if ($id <= 0 || $cantidad <= 0) {
+            fallar(400, 'Cantidad o ID de producto inválido.');
+        }
+        $cantidades[$id] = ($cantidades[$id] ?? 0) + $cantidad;
+    }
+
+    if (count($cantidades) === 0) {
+        fallar(400, 'El pedido debe incluir al menos un producto.');
+    }
+
+    ksort($cantidades);   // mismo orden de bloqueo en todos los pedidos: evita bloqueos mutuos
+
+    return [
+        'cliente'     => $cliente,
+        'telefono'    => $telefono !== '' ? $telefono : null,
+        'direccion'   => $direccion,
+        'metodo_pago' => $metodoPago,
+        'cantidades'  => $cantidades,
+    ];
+}
+
+/**
+ * Registra el pedido y descuenta el stock en UNA sola transacción:
+ * o se guarda todo, o no se guarda nada. Devuelve [id_compra, total].
+ */
+function registrarPedido(PDO $pdo, array $pedido): array
+{
+    $pdo->beginTransaction();
+
+    // 1. Validar con los datos reales de la BD (el precio del navegador no cuenta).
+    //    FOR UPDATE bloquea cada fila hasta el commit para que dos pedidos no se pisen el stock.
+    $stmtProducto = $pdo->prepare('SELECT id, nombre, precio, stock, activo FROM productos WHERE id = :id FOR UPDATE');
+    $lineas = [];
+    $total  = 0.0;
+
+    foreach ($pedido['cantidades'] as $id => $cantidad) {
+        $stmtProducto->execute([':id' => $id]);
+        $producto = $stmtProducto->fetch();
+
+        if (!$producto || (int) $producto['activo'] !== 1) {
+            fallar(404, $producto
+                ? "El producto '{$producto['nombre']}' ya no se encuentra disponible."
+                : 'Un producto de tu carrito ya no se encuentra disponible.');
+        }
+        if ((int) $producto['stock'] < $cantidad) {
+            fallar(409, "Stock insuficiente para '{$producto['nombre']}'. Disponibles: {$producto['stock']}.");
+        }
+
+        $precio   = (float) $producto['precio'];
+        $total   += $precio * $cantidad;
+        $lineas[] = ['id' => $id, 'nombre' => $producto['nombre'], 'precio' => $precio, 'cantidad' => $cantidad];
+    }
+
+    $total = round($total, 2);
+
+    // 2. Cabecera de la compra
+    $pdo->prepare('
+        INSERT INTO compras (nombre_cliente, telefono, direccion, metodo_pago, total)
+        VALUES (:nombre, :telefono, :direccion, :metodo_pago, :total)
+    ')->execute([
+        ':nombre'      => $pedido['cliente'],
+        ':telefono'    => $pedido['telefono'],
+        ':direccion'   => $pedido['direccion'],
+        ':metodo_pago' => $pedido['metodo_pago'],
+        ':total'       => $total,
+    ]);
+    $compraId = (int) $pdo->lastInsertId();
+
+    // 3. Detalle de cada producto + descuento de inventario
+    $stmtDetalle = $pdo->prepare('
+        INSERT INTO compras_detalle (compra_id, producto_id, nombre, precio, cantidad)
+        VALUES (:compra_id, :producto_id, :nombre, :precio, :cantidad)
+    ');
+    $stmtStock = $pdo->prepare('UPDATE productos SET stock = stock - :cantidad WHERE id = :id');
+
+    foreach ($lineas as $linea) {
+        $stmtDetalle->execute([
+            ':compra_id'   => $compraId,
+            ':producto_id' => $linea['id'],
+            ':nombre'      => $linea['nombre'],
+            ':precio'      => $linea['precio'],
+            ':cantidad'    => $linea['cantidad'],
+        ]);
+        $stmtStock->execute([':cantidad' => $linea['cantidad'], ':id' => $linea['id']]);
+    }
+
+    $pdo->commit();
+
+    return [$compraId, $total];
+}
+
+// --------------------------------------------
+// Enrutado por método HTTP
+// --------------------------------------------
+
+switch ($_SERVER['REQUEST_METHOD']) {
+
+    // ---------- POST: nueva compra (público) ----------
     case 'POST':
         try {
-            $input = file_get_contents('php://input');
-            $datos = json_decode($input, true);
-
-            if (!$datos || !is_array($datos)) {
-                http_response_code(400);
-                echo json_encode(['ok' => false, 'error' => 'Cuerpo de solicitud JSON inválido.']);
-                exit();
-            }
-
-            // Validar campos del cliente
-            $nombreCliente = trim($datos['nombre_cliente'] ?? '');
-            $telefono      = trim($datos['telefono'] ?? '');
-            $direccion     = trim($datos['direccion'] ?? '');
-            $metodoPago    = trim($datos['metodo_pago'] ?? 'efectivo');
-            $productos     = $datos['productos'] ?? [];
-
-            if (empty($nombreCliente)) {
-                http_response_code(400);
-                echo json_encode(['ok' => false, 'error' => 'El nombre del cliente es obligatorio.']);
-                exit();
-            }
-
-            if (empty($direccion)) {
-                http_response_code(400);
-                echo json_encode(['ok' => false, 'error' => 'La dirección de entrega es obligatoria.']);
-                exit();
-            }
-
-            if (!is_array($productos) || count($productos) === 0) {
-                http_response_code(400);
-                echo json_encode(['ok' => false, 'error' => 'El pedido debe incluir al menos un producto.']);
-                exit();
-            }
-
-            // Validar datos de tarjeta si aplica
-            $tarjetaUltimos4 = null;
-            $tarjetaTitular  = null;
-            $tarjetaVence    = null;
-
-            if ($metodoPago === 'tarjeta') {
-                $tarjetaInfo = $datos['tarjeta'] ?? [];
-                $tarjetaUltimos4 = trim($tarjetaInfo['ultimos4'] ?? '');
-                $tarjetaTitular  = trim($tarjetaInfo['titular'] ?? '');
-                $tarjetaVence    = trim($tarjetaInfo['vence'] ?? '');
-
-                if (empty($tarjetaUltimos4) || empty($tarjetaTitular)) {
-                    http_response_code(400);
-                    echo json_encode(['ok' => false, 'error' => 'Datos de tarjeta incompletos.']);
-                    exit();
-                }
-            } else {
-                $metodoPago = 'efectivo';
-            }
-
-            // Iniciar transacción atómica en MySQL
-            $pdo->beginTransaction();
-
-            $totalCalculado = 0.0;
-            $itemsValidados = [];
-
-            // 1. Validar productos, precios vigentes y stock en la base de datos
-            $stmtProducto = $pdo->prepare('SELECT id, nombre, precio, stock, activo FROM productos WHERE id = :id FOR UPDATE');
-
-            foreach ($productos as $item) {
-                $productoId = (int) ($item['id'] ?? 0);
-                $cantidad   = (int) ($item['cantidad'] ?? 0);
-
-                if ($productoId <= 0 || $cantidad <= 0) {
-                    $pdo->rollBack();
-                    http_response_code(400);
-                    echo json_encode(['ok' => false, 'error' => 'Cantidad o ID de producto inválido.']);
-                    exit();
-                }
-
-                $stmtProducto->execute([':id' => $productoId]);
-                $productoDB = $stmtProducto->fetch();
-
-                if (!$productoDB || (int) $productoDB['activo'] !== 1) {
-                    $pdo->rollBack();
-                    http_response_code(404);
-                    echo json_encode([
-                        'ok'    => false,
-                        'error' => "El producto '{$item['nombre']}' ya no se encuentra disponible."
-                    ]);
-                    exit();
-                }
-
-                $stockActual = (int) $productoDB['stock'];
-                if ($stockActual < $cantidad) {
-                    $pdo->rollBack();
-                    http_response_code(409);
-                    echo json_encode([
-                        'ok'    => false,
-                        'error' => "Stock insuficiente para '{$productoDB['nombre']}'. Disponibles: {$stockActual}."
-                    ]);
-                    exit();
-                }
-
-                $precioReal = (float) $productoDB['precio'];
-                $subtotal   = $precioReal * $cantidad;
-                $totalCalculado += $subtotal;
-
-                $itemsValidados[] = [
-                    'id'       => $productoId,
-                    'nombre'   => $productoDB['nombre'],
-                    'precio'   => $precioReal,
-                    'cantidad' => $cantidad
-                ];
-            }
-
-            // 2. Insertar cabecera de la compra
-            $stmtCompra = $pdo->prepare('
-                INSERT INTO compras (
-                    nombre_cliente, telefono, direccion, metodo_pago, total,
-                    tarjeta_ultimos4, tarjeta_titular, tarjeta_vence
-                ) VALUES (
-                    :nombre, :telefono, :direccion, :metodo_pago, :total,
-                    :ultimos4, :titular, :vence
-                )
-            ');
-
-            $stmtCompra->execute([
-                ':nombre'      => $nombreCliente,
-                ':telefono'    => $telefono,
-                ':direccion'   => $direccion,
-                ':metodo_pago' => $metodoPago,
-                ':total'       => $totalCalculado,
-                ':ultimos4'    => $tarjetaUltimos4,
-                ':titular'     => $tarjetaTitular,
-                ':vence'       => $tarjetaVence
-            ]);
-
-            $compraId = (int) $pdo->lastInsertId();
-
-            // 3. Insertar detalle de productos y descontar stock
-            $stmtDetalle = $pdo->prepare('
-                INSERT INTO compras_detalle (compra_id, producto_id, nombre, precio, cantidad)
-                VALUES (:compra_id, :producto_id, :nombre, :precio, :cantidad)
-            ');
-
-            $stmtDescontarStock = $pdo->prepare('
-                UPDATE productos 
-                SET stock = stock - :cantidad 
-                WHERE id = :id
-            ');
-
-            foreach ($itemsValidados as $itemVal) {
-                // Registrar detalle
-                $stmtDetalle->execute([
-                    ':compra_id'    => $compraId,
-                    ':producto_id'  => $itemVal['id'],
-                    ':nombre'       => $itemVal['nombre'],
-                    ':precio'       => $itemVal['precio'],
-                    ':cantidad'     => $itemVal['cantidad']
-                ]);
-
-                // Descontar inventario
-                $stmtDescontarStock->execute([
-                    ':cantidad' => $itemVal['cantidad'],
-                    ':id'       => $itemVal['id']
-                ]);
-            }
-
-            // Confirmar transacción
-            $pdo->commit();
+            $pedido = leerPedido();
+            [$compraId, $total] = registrarPedido($pdo, $pedido);
 
             http_response_code(201);
             echo json_encode([
                 'ok'      => true,
                 'mensaje' => '¡Pedido registrado exitosamente!',
                 'id'      => $compraId,
-                'total'   => round($totalCalculado, 2),
-                'cliente' => $nombreCliente
+                'total'   => $total,
+                'cliente' => $pedido['cliente'],
             ]);
-
         } catch (PDOException $e) {
-            if ($pdo->inTransaction()) {
-                $pdo->rollBack();
-            }
-            http_response_code(500);
-            echo json_encode([
-                'ok'    => false,
-                'error' => 'Error al procesar el pedido en el servidor.',
-                'debug' => $e->getMessage()
-            ]);
+            fallar(500, 'Error al procesar el pedido en el servidor.');
         }
         break;
 
-    // ========================================
-    // GET — Listar compras o ver detalle
-    // ========================================
+    // ---------- GET: historial o detalle (solo admin) ----------
     case 'GET':
+        requerir_rol('admin');
         try {
-            // Si viene ?id=X, devolver una sola compra con su desglose
             if (isset($_GET['id'])) {
-                $compraId = (int) $_GET['id'];
-
-                $stmtCompra = $pdo->prepare('SELECT * FROM compras WHERE id = :id');
-                $stmtCompra->execute([':id' => $compraId]);
-                $compra = $stmtCompra->fetch();
+                $stmt = $pdo->prepare('SELECT * FROM compras WHERE id = :id');
+                $stmt->execute([':id' => (int) $_GET['id']]);
+                $compra = $stmt->fetch();
 
                 if (!$compra) {
-                    http_response_code(404);
-                    echo json_encode(['ok' => false, 'error' => 'Compra no encontrada.']);
-                    exit();
+                    fallar(404, 'Compra no encontrada.');
                 }
 
-                $stmtDetalle = $pdo->prepare('SELECT * FROM compras_detalle WHERE compra_id = :compra_id');
-                $stmtDetalle->execute([':compra_id' => $compraId]);
-                $detalle = $stmtDetalle->fetchAll();
+                $stmt = $pdo->prepare('SELECT * FROM compras_detalle WHERE compra_id = :compra_id');
+                $stmt->execute([':compra_id' => $compra['id']]);
+                $compra['productos'] = $stmt->fetchAll();
 
-                $compra['productos'] = $detalle;
-
-                echo json_encode([
-                    'ok'     => true,
-                    'compra' => $compra
-                ]);
+                echo json_encode(['ok' => true, 'compra' => $compra]);
             } else {
-                // Listar todas las compras ordenadas de la más reciente a la más antigua
-                $stmt = $pdo->query('
-                    SELECT c.*, COUNT(cd.id) as total_items
+                $compras = $pdo->query('
+                    SELECT c.*, COUNT(cd.id) AS total_items
                     FROM compras c
                     LEFT JOIN compras_detalle cd ON c.id = cd.compra_id
                     GROUP BY c.id
                     ORDER BY c.fecha DESC
-                ');
-                $compras = $stmt->fetchAll();
+                ')->fetchAll();
 
-                echo json_encode([
-                    'ok'      => true,
-                    'compras' => $compras
-                ]);
+                echo json_encode(['ok' => true, 'compras' => $compras]);
             }
-
         } catch (PDOException $e) {
-            http_response_code(500);
-            echo json_encode([
-                'ok'    => false,
-                'error' => 'Error al consultar las compras.'
-            ]);
+            fallar(500, 'Error al consultar las compras.');
         }
         break;
 
-    // ========================================
-    // Método no soportado
-    // ========================================
     default:
-        http_response_code(405);
-        echo json_encode(['ok' => false, 'error' => 'Método no permitido.']);
-        break;
+        fallar(405, 'Método no permitido.');
 }

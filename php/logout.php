@@ -1,29 +1,27 @@
 <?php
-// ============================================
-// Pan Clásico — Cerrar Sesión Admin
-// ============================================
+header('Content-Type: application/json; charset=utf-8');
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['ok' => false, 'error' => 'Método no permitido.']);
+    exit();
+}
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Vaciar variables de sesión
 $_SESSION = [];
-
-// Destruir cookie de sesión si existe
-if (ini_get("session.use_cookies")) {
+if (ini_get('session.use_cookies')) {
     $params = session_get_cookie_params();
-    setcookie(session_name(), '', time() - 42000,
-        $params["path"], $params["domain"],
-        $params["secure"], $params["httponly"]
-    );
+    setcookie(session_name(), '', [
+        'expires' => time() - 42000,
+        'path' => $params['path'],
+        'domain' => $params['domain'],
+        'secure' => $params['secure'],
+        'httponly' => $params['httponly'],
+        'samesite' => $params['samesite'] ?? 'Lax',
+    ]);
 }
-
-// Destruir la sesión
 session_destroy();
-
-header('Content-Type: application/json; charset=utf-8');
-echo json_encode([
-    'ok'      => true,
-    'mensaje' => 'Sesión cerrada exitosamente.'
-]);
+echo json_encode(['ok' => true, 'mensaje' => 'Sesión cerrada.']);

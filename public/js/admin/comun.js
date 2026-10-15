@@ -12,11 +12,11 @@
  */
 
 // Rutas de API PHP
-const API_LOGIN_URL = '../php/login.php';
-const API_LOGOUT_URL = '../php/logout.php';
-const API_PRODUCTOS_URL = '../php/productos.php';
-const API_COMPRAS_URL = '../php/compras.php';
-const API_MENSAJES_URL = '../php/mensajes.php';
+const API_LOGIN_URL = '../../php/login.php';
+const API_LOGOUT_URL = '../../php/logout.php';
+const API_PRODUCTOS_URL = '../../php/productos.php';
+const API_COMPRAS_URL = '../../php/compras.php';
+const API_MENSAJES_URL = '../../php/mensajes.php';
 
 // Estado global de la aplicación
 const state = {
@@ -58,7 +58,7 @@ async function verificarSesionAdmin() {
         });
 
         if (!resp.ok) {
-            window.location.replace('login.html');
+            window.location.replace('../login.html');
             return false;
         }
 
@@ -69,12 +69,12 @@ async function verificarSesionAdmin() {
             actualizarInterfazUsuario(state.usuario);
             return true;
         } else {
-            window.location.replace('login.html');
+            window.location.replace('../login.html');
             return false;
         }
     } catch (err) {
         console.error('Error al comprobar la sesión:', err);
-        window.location.replace('login.html');
+        window.location.replace('../login.html');
         return false;
     }
 }
@@ -100,7 +100,7 @@ async function cerrarSesion() {
     } finally {
         mostrarToast('Sesión cerrada. Redirigiendo...', 'aviso');
         setTimeout(() => {
-            window.location.href = 'login.html';
+            window.location.href = '../login.html';
         }, 500);
     }
 }
