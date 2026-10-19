@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,23 +7,18 @@
     <title>Catálogo de Panes Artesanales | Pan Clásico</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
-
 <body>
 
-    <!-- ==================== BARRA DE NAVEGACIÓN ==================== -->
     <header>
         <nav class="navbar">
-            <div class="logo">
-                🥖 Pan Clásico
-            </div>
-
+            <div class="logo">🥖 Pan Clásico</div>
             <ul class="menu">
                 <li><a href="index.html">Inicio</a></li>
                 <li><a href="catalogo.html" class="activo">Catálogo</a></li>
                 <li><a href="contacto.html">Contacto</a></li>
                 <li><a href="login.html">Login</a></li>
                 <li>
-                    <a href="carrito.html" aria-label="Carrito de compras" class="nav-cart-link">
+                    <a href="carrito.html" class="nav-cart-link" aria-label="Carrito de compras">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L21 7H6"/>
                             <circle cx="10" cy="20" r="1"/>
@@ -37,22 +31,19 @@
         </nav>
     </header>
 
-    <!-- ==================== CONTENIDO PRINCIPAL ==================== -->
     <main>
         <section class="pagina catalogo-pagina">
-            
             <header class="catalogo-header">
                 <span class="subtitulo">HORNEADO CON AMOR</span>
             </header>
 
-            <!-- Barra de Búsqueda y Herramientas -->
             <div class="catalogo-toolbar">
                 <div class="buscador-box">
                     <span class="buscador-icono" aria-hidden="true">🔍</span>
-                    <input 
-                        type="search" 
-                        id="input-busqueda" 
-                        placeholder="Buscar por nombre (ej. Concha, Baguette, Cuerno)..." 
+                    <input
+                        type="search"
+                        id="input-busqueda"
+                        placeholder="Buscar por nombre (ej. Concha, Baguette, Cuerno)..."
                         autocomplete="off"
                         aria-label="Buscar pan por nombre"
                     >
@@ -60,25 +51,19 @@
                 </div>
             </div>
 
-            <!-- Filtros de Categorías -->
             <nav id="catalogo-filtros" class="catalogo-filtros" aria-label="Filtrar por categoría"></nav>
 
-            <!-- Mensaje y Spinner de Carga -->
             <div id="catalogo-mensaje-carga" class="mensaje-carga-box" role="status">
                 <div class="spinner"></div>
                 <p>Cargando panes recién horneados...</p>
             </div>
 
-            <!-- Grilla Dinámica de Tarjetas de Productos -->
             <div id="productos" class="productos-grid" aria-live="polite"></div>
-
         </section>
     </main>
 
-    <!-- Contenedor Flotante para Notificaciones Toast -->
     <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
-    <!-- ==================== PIE DE PÁGINA ==================== -->
     <footer>
         <div class="footer-content">
             <div class="footer-brand">🥖 Pan Clásico</div>
@@ -86,7 +71,6 @@
         </div>
     </footer>
 
-    <!-- ==================== SCRIPTS ==================== -->
     <script src="js/badge.js"></script>
     <script src="js/catalogo.js"></script>
 </body>

@@ -38,6 +38,7 @@ Leyenda: ✅ hecho y probado · ⏳ siguiente · ⬜ pendiente
 | ✅ | `php/compras.php` | Se corrigió el error de `$item['nombre']`. Las líneas repetidas se suman para validar el stock. Se validan longitudes y datos de tarjeta. Usa la función `fallar()` de `db.php`. |
 | ✅ | `php/mensajes.php` | Valida longitudes (nombre 150, correo 200, mensaje 2000) y que cada campo sea texto. Se quitó el código sobrante (soporte de `$_POST` y el alias `correo`, que ningún archivo usaba). Usa `fallar()`. |
 | ⏳ | `php/productos.php` | Rechazar precios o stock negativos y nombres vacíos. Convertir tipos en el `PUT`. Usar `fallar()`. |
+| ⬜ | `php/usuarios.php` *(nuevo)* | Solo admin. `GET` lista las cuentas (sin contraseñas) y `PUT` cambia el rol. Reglas: nadie puede cambiar su propio rol y siempre debe quedar al menos un admin. |
 | ⬜ | `php/logout.php` | Revisión corta. |
 | ⬜ | `login.php` y `registro.php` | Usar `fallar()` para quitar los bloques de error repetidos. |
 | ⬜ | Archivos vacíos | Borrar `php/config.php` y `php/includes/nav.php`. |
@@ -51,7 +52,7 @@ Leyenda: ✅ hecho y probado · ⏳ siguiente · ⬜ pendiente
 | ⬜ | `public/js/catalogo.js` | Quitar duplicados y los `onclick` en línea. Usar `utils.js`. |
 | ⬜ | `public/js/carrito.js` | Quitar duplicados. Decidir qué hacer con los datos de tarjeta. Usar `utils.js`. |
 | ⬜ | `public/js/contacto.js` | Quitar duplicados. Usar `utils.js`. |
-| ⬜ | `public/js/admin.js` | El más grande (unas 1000 líneas). Quitar duplicados y simplificar. |
+| ⬜ | `public/js/admin.js` | Se reemplaza por el panel por páginas (ver la sección *Panel de administración*). |
 | ⬜ | Archivos vacíos | Borrar `public/js/app.js` y `public/js/inicio.js`. |
 
 ### Páginas y estilos
@@ -59,8 +60,34 @@ Leyenda: ✅ hecho y probado · ⏳ siguiente · ⬜ pendiente
 | Estado | Archivo | Qué se revisa o corrige |
 |---|---|---|
 | ⬜ | `public/index.html`, `catalogo.html`, `carrito.html`, `contacto.html` | Quitar estilos en línea. Agregar enlace de "Iniciar sesión" en el menú. |
-| ⬜ | `public/admin.html` | Quitar los 17 estilos en línea y los `onclick`. |
+| ⬜ | `public/admin.html` | Se reemplaza por el panel por páginas (ver la sección *Panel de administración*). |
 | ⬜ | `public/css/styles.css` | Hoy son 2812 líneas para todo. Separar `styles.css` (público) y `admin.css` (panel). Quitar selectores duplicados. |
+
+### Panel de administración (una página por sección)
+
+Hoy todo el panel vive en `admin.html` + `admin.js` (unas 1000 líneas, con pestañas). Se separa en una página por tarea, cada una con su propio JavaScript pequeño.
+
+```
+public/admin/
+├── index.html       Resumen: totales de productos, ventas, pedidos y mensajes
+├── productos.html   Crear, editar, activar/desactivar y eliminar productos
+├── compras.html     Historial de compras y detalle de cada pedido
+├── mensajes.html    Bandeja de contacto
+└── usuarios.html    Cuentas registradas y cambio de rol (cliente / admin)
+```
+
+| Estado | Archivo | Qué contiene |
+|---|---|---|
+| ⬜ | `public/js/admin/comun.js` | Lo que comparten todas las páginas: comprobar que hay sesión de admin, menú de navegación, cerrar sesión, ventanas, avisos, formato de dinero y fecha. Escrito una sola vez. |
+| ⬜ | `public/admin/productos.html` + `js/admin/productos.js` | Tabla de productos y ventana para crear o editar. |
+| ⬜ | `public/admin/compras.html` + `js/admin/compras.js` | Tabla de compras y ventana con el detalle. |
+| ⬜ | `public/admin/mensajes.html` + `js/admin/mensajes.js` | Mensajes recibidos y borrado. |
+| ⬜ | `public/admin/usuarios.html` + `js/admin/usuarios.js` | Tabla de cuentas con un selector de rol. Usa `php/usuarios.php`. |
+| ⬜ | `public/admin/index.html` + `js/admin/resumen.js` | Tarjetas de resumen con enlaces a cada sección. |
+| ⬜ | `public/css/admin.css` | Estilos del panel, separados del CSS público. |
+| ⬜ | Cierre | Borrar `admin.html` y `admin.js`. Actualizar `auth.js` para que el admin entre a `admin/index.html`. Las páginas nuevas llaman a la API con `../../php/`. |
+
+Orden: primero `comun.js` y `productos`, luego `compras`, `mensajes` y el resumen. Va después de revisar `utils.js` y los JavaScript públicos, porque comparte con ellos las funciones de avisos y formato.
 
 ### Base de datos
 
@@ -90,6 +117,10 @@ Leyenda: ✅ hecho y probado · ⏳ siguiente · ⬜ pendiente
 | ⬜ | Configurar Render | Variables de entorno con los datos de Aiven. Los servicios gratis se duermen tras 15 minutos sin visitas. |
 
 ---
+
+## Decisiones tomadas
+
+- **Panel admin por páginas**, incluida una página de **Usuarios** para cambiar roles sin phpMyAdmin.
 
 ## Decisiones pendientes
 

@@ -1,0 +1,27 @@
+ESTADO ACTUAL DEL PROYECTO — Pan Clásico
+
+Proyecto: Web de panadería full-stack (PHP + MySQL + HTML/CSS/JS)
+Entorno: XAMPP
+
+Archivos públicos ya limpios y unificados:
+- index.html
+- catalogo.html
+- carrito.html
+- contacto.html
+- login.html (acepta correo o usuario, redirige siempre a index.html)
+- styles.css (solo estilos públicos, sin admin)
+
+Backend ya avanzado (según plan_de_mejoras.md):
+- auth.php, login.php, registro.php, db.php, productos.php, compras.php, mensajes.php
+
+Pendiente principal:
+- Panel de administración por páginas (public/admin/)
+- usuarios.php
+- Separar admin.css
+- Mejoras de utils.js y JS públicos
+
+Reglas de trabajo:
+- Un archivo a la vez
+- Código limpio y mínimo (sin comentarios ni explicaciones)
+- Seguridad primero
+- Conservar el diseño actual de las páginas públicas

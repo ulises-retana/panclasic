@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,16 +7,11 @@
     <title>Mi Carrito de Compras | Pan Clásico</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
-
 <body>
 
-    <!-- ==================== NAVEGACIÓN ==================== -->
     <header>
         <nav class="navbar">
-            <div class="logo">
-                🥖 Pan Clásico
-            </div>
-
+            <div class="logo">🥖 Pan Clásico</div>
             <ul class="menu">
                 <li><a href="index.html">Inicio</a></li>
                 <li><a href="catalogo.html">Catálogo</a></li>
@@ -26,9 +20,9 @@
                 <li>
                     <a href="carrito.html" class="activo nav-cart-link" aria-label="Carrito de compras">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L21 7H6" />
-                            <circle cx="10" cy="20" r="1" />
-                            <circle cx="18" cy="20" r="1" />
+                            <path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L21 7H6"/>
+                            <circle cx="10" cy="20" r="1"/>
+                            <circle cx="18" cy="20" r="1"/>
                         </svg>
                         <span class="cart-badge">0</span>
                     </a>
@@ -37,10 +31,8 @@
         </nav>
     </header>
 
-    <!-- ==================== SECCIÓN DEL CARRITO ==================== -->
     <main>
         <section class="pagina pagina-carrito">
-
             <header class="carrito-header">
                 <span class="subtitulo">TU SELECCIÓN ARTESANAL</span>
                 <h1>Mi Canasta de Panes</h1>
@@ -48,20 +40,14 @@
             </header>
 
             <div class="carrito-contenedor-grid">
-                
-                <!-- Columna Izquierda: Listado de Productos -->
                 <div class="columna-productos">
-                    <div id="carrito" class="carrito-caja" aria-live="polite">
-                        <!-- Renderizado dinámicamente por carrito.js -->
-                    </div>
+                    <div id="carrito" class="carrito-caja" aria-live="polite"></div>
                 </div>
 
-                <!-- Columna Derecha: Formulario de Compra (Checkout) -->
                 <aside id="seccion-checkout" class="columna-checkout">
                     <div class="checkout-card">
-                        
                         <h3>Resumen del Pedido</h3>
-                        
+
                         <div class="resumen-lineas">
                             <div class="resumen-fila">
                                 <span>Subtotal</span>
@@ -78,9 +64,7 @@
                             </div>
                         </div>
 
-                        <!-- Formulario de Datos del Cliente -->
                         <form id="form-checkout" class="form-checkout">
-                            
                             <h4>Datos de Entrega</h4>
 
                             <div class="campo-grupo">
@@ -98,9 +82,8 @@
                                 <textarea id="cliente-direccion" name="cliente_direccion" rows="2" placeholder="Calle, número, colonia y referencias..." required></textarea>
                             </div>
 
-                            <!-- Método de Pago -->
                             <h4>Método de Pago</h4>
-                            
+
                             <div class="metodos-pago-opciones">
                                 <label class="metodo-radio-card">
                                     <input type="radio" name="metodo_pago" value="efectivo" id="pago-efectivo" checked>
@@ -121,18 +104,15 @@
                                 </label>
                             </div>
 
-                            <!-- Campos Condicionales de Tarjeta -->
                             <div id="datos-tarjeta" class="datos-tarjeta-box" style="display: none;">
                                 <div class="campo-grupo">
                                     <label for="tarjeta-numero">Número de tarjeta</label>
                                     <input type="text" id="tarjeta-numero" placeholder="4000 1234 5678 9010" maxlength="19">
                                 </div>
-
                                 <div class="campo-grupo">
                                     <label for="tarjeta-titular">Nombre en la tarjeta</label>
                                     <input type="text" id="tarjeta-titular" placeholder="Como figura en el plástico">
                                 </div>
-
                                 <div class="campos-tarjeta-duo">
                                     <div class="campo-grupo">
                                         <label for="tarjeta-vence">Vence</label>
@@ -145,7 +125,6 @@
                                 </div>
                             </div>
 
-                            <!-- Botón de Envío -->
                             <button type="submit" class="boton btn-confirmar-compra">
                                 🥐 Confirmar y Pedir Ahora
                             </button>
@@ -153,21 +132,15 @@
                             <p class="nota-seguridad">
                                 🔒 Tus datos están protegidos y viajan de forma segura.
                             </p>
-
                         </form>
-
                     </div>
                 </aside>
-
             </div>
-
         </section>
     </main>
 
-    <!-- Contenedor Flotante para Notificaciones Toast -->
     <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
-    <!-- ==================== PIE DE PÁGINA ==================== -->
     <footer>
         <div class="footer-content">
             <div class="footer-brand">🥖 Pan Clásico</div>
@@ -175,10 +148,7 @@
         </div>
     </footer>
 
-    <!-- ==================== SCRIPTS ==================== -->
     <script src="js/badge.js"></script>
     <script src="js/carrito.js"></script>
-
 </body>
-
 </html>
