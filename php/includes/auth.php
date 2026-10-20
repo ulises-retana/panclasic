@@ -37,10 +37,10 @@ function es_admin(): bool
 
 function iniciar_sesion_usuario(array $usuario): void
 {
-    session_regenerate_id(true);
     $_SESSION['usuario'] = [
         'id'     => (int) $usuario['id'],
         'nombre' => (string) $usuario['nombre'],
+        'email'  => (string) ($usuario['email'] ?? ''),
         'rol'    => (string) $usuario['rol'],
     ];
 }

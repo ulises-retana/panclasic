@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Catálogo de panes artesanales de Pan Clásico: pan dulce, bolillos, cuernos, baguettes y repostería recién horneada.">
+    <meta name="description"
+        content="Catálogo de panes artesanales de Pan Clásico: pan dulce, bolillos, cuernos, baguettes y repostería recién horneada.">
     <title>Catálogo de Panes Artesanales | Pan Clásico</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body>
 
     <header>
@@ -19,10 +22,11 @@
                 <li><a href="login.html">Login</a></li>
                 <li>
                     <a href="carrito.html" class="nav-cart-link" aria-label="Carrito de compras">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L21 7H6"/>
-                            <circle cx="10" cy="20" r="1"/>
-                            <circle cx="18" cy="20" r="1"/>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L21 7H6" />
+                            <circle cx="10" cy="20" r="1" />
+                            <circle cx="18" cy="20" r="1" />
                         </svg>
                         <span class="cart-badge">0</span>
                     </a>
@@ -36,20 +40,18 @@
             <header class="catalogo-header">
                 <span class="subtitulo">HORNEADO CON AMOR</span>
                 <h1>Nuestros Panes Artesanales</h1>
-                <p class="catalogo-subtitulo">Elige tus favoritos, agrégalos a tu canasta y te los llevamos recién horneados.</p>
+                <p class="catalogo-subtitulo">Elige tus favoritos, agrégalos a tu canasta y te los llevamos recién
+                    horneados.</p>
             </header>
 
             <div class="catalogo-toolbar">
                 <div class="buscador-box">
                     <span class="buscador-icono" aria-hidden="true">🔍</span>
-                    <input
-                        type="search"
-                        id="input-busqueda"
-                        placeholder="Buscar por nombre (ej. Concha, Baguette, Cuerno)..."
-                        autocomplete="off"
-                        aria-label="Buscar pan por nombre"
-                    >
-                    <button type="button" id="btn-limpiar-busqueda" class="btn-limpiar-busqueda" style="display: none;" aria-label="Limpiar búsqueda">✕</button>
+                    <input type="search" id="input-busqueda"
+                        placeholder="Buscar por nombre (ej. Concha, Baguette, Cuerno)..." autocomplete="off"
+                        aria-label="Buscar pan por nombre">
+                    <button type="button" id="btn-limpiar-busqueda" class="btn-limpiar-busqueda" style="display: none;"
+                        aria-label="Limpiar búsqueda">✕</button>
                 </div>
             </div>
 
@@ -73,7 +75,9 @@
         </div>
     </footer>
 
+    <script src="js/utils.js"></script>
     <script src="js/badge.js"></script>
     <script src="js/catalogo.js"></script>
 </body>
+
 </html>

@@ -1,12 +1,13 @@
 /* badge.js — Contador del carrito en el menú. Requiere utils.js. */
 
 function actualizarBadge() {
-  const el = document.getElementById('contador-carrito');
-  if (!el) return;
-  const total = leerCarrito().reduce((suma, linea) => suma + linea.cantidad, 0);
-  el.textContent = total;
-  el.hidden = total === 0;
+  const insignia = document.querySelector('.cart-badge');
+  if (!insignia) return;
+  const total = totalPiezas();
+  insignia.textContent = total;
+  insignia.style.display = total > 0 ? 'flex' : 'none';
 }
 
 document.addEventListener('DOMContentLoaded', actualizarBadge);
+document.addEventListener('carrito:actualizado', actualizarBadge);
 window.addEventListener('storage', actualizarBadge);

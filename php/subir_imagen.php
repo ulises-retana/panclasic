@@ -69,4 +69,4 @@ if (!move_uploaded_file($archivo['tmp_name'], "$carpeta/$nombre")) {
     fallar('No se pudo guardar la imagen', 500);
 }
 
-echo json_encode(['ruta' => "img/productos/$nombre"]);
+echo json_encode(['ruta' => "productos/$nombre"]);

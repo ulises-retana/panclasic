@@ -42,7 +42,7 @@ async function cambiarRol(selector) {
   const rol = selector.value;
   selector.disabled = true;
   try {
-    await api('usuarios.php', { method: 'PUT', cuerpo: { id, rol } });
+    await api(`usuarios.php?id=${id}`, { method: 'PUT', cuerpo: { rol } });
     mostrarToast('Rol actualizado');
   } catch (err) {
     mostrarToast(err.message, 'error');
@@ -59,3 +59,4 @@ adminListo.then(async usuario => {
   yo = usuario;
   await cargarUsuarios();
 });
+    

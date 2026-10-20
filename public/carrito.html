@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Revisa tu carrito de compras y confirma tu pedido de pan artesanal en Pan Clásico.">
+    <meta name="description"
+        content="Revisa tu carrito de compras y confirma tu pedido de pan artesanal en Pan Clásico.">
     <title>Mi Carrito de Compras | Pan Clásico</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body>
 
     <header>
@@ -19,10 +22,11 @@
                 <li><a href="login.html">Login</a></li>
                 <li>
                     <a href="carrito.html" class="activo nav-cart-link" aria-label="Carrito de compras">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L21 7H6"/>
-                            <circle cx="10" cy="20" r="1"/>
-                            <circle cx="18" cy="20" r="1"/>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L21 7H6" />
+                            <circle cx="10" cy="20" r="1" />
+                            <circle cx="18" cy="20" r="1" />
                         </svg>
                         <span class="cart-badge">0</span>
                     </a>
@@ -36,7 +40,8 @@
             <header class="carrito-header">
                 <span class="subtitulo">TU SELECCIÓN ARTESANAL</span>
                 <h1>Mi Canasta de Panes</h1>
-                <p>Verifica tus piezas de pan recién horneado y completa tus datos para que te las llevemos calientitas.</p>
+                <p>Verifica tus piezas de pan recién horneado y completa tus datos para que te las llevemos calientitas.
+                </p>
             </header>
 
             <div class="carrito-contenedor-grid">
@@ -69,17 +74,20 @@
 
                             <div class="campo-grupo">
                                 <label for="cliente-nombre">Nombre completo *</label>
-                                <input type="text" id="cliente-nombre" name="cliente_nombre" placeholder="Ej. Juan Pérez" required>
+                                <input type="text" id="cliente-nombre" name="cliente_nombre"
+                                    placeholder="Ej. Juan Pérez" required>
                             </div>
 
                             <div class="campo-grupo">
                                 <label for="cliente-telefono">Teléfono de contacto *</label>
-                                <input type="tel" id="cliente-telefono" name="cliente_telefono" placeholder="Ej. 55 1234 5678" required>
+                                <input type="tel" id="cliente-telefono" name="cliente_telefono"
+                                    placeholder="Ej. 55 1234 5678" required>
                             </div>
 
                             <div class="campo-grupo">
                                 <label for="cliente-direccion">Dirección de entrega *</label>
-                                <textarea id="cliente-direccion" name="cliente_direccion" rows="2" placeholder="Calle, número, colonia y referencias..." required></textarea>
+                                <textarea id="cliente-direccion" name="cliente_direccion" rows="2"
+                                    placeholder="Calle, número, colonia y referencias..." required></textarea>
                             </div>
 
                             <h4>Método de Pago</h4>
@@ -107,7 +115,8 @@
                             <div id="datos-tarjeta" class="datos-tarjeta-box" style="display: none;">
                                 <div class="campo-grupo">
                                     <label for="tarjeta-numero">Número de tarjeta</label>
-                                    <input type="text" id="tarjeta-numero" placeholder="4000 1234 5678 9010" maxlength="19">
+                                    <input type="text" id="tarjeta-numero" placeholder="4000 1234 5678 9010"
+                                        maxlength="19">
                                 </div>
                                 <div class="campo-grupo">
                                     <label for="tarjeta-titular">Nombre en la tarjeta</label>
@@ -148,7 +157,9 @@
         </div>
     </footer>
 
+    <script src="js/utils.js"></script>
     <script src="js/badge.js"></script>
     <script src="js/carrito.js"></script>
 </body>
+
 </html>

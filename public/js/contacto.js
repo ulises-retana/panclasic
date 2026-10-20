@@ -15,7 +15,7 @@ formularioContacto.addEventListener('submit', async e => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         nombre: datos.get('nombre'),
-        email: datos.get('email'),
+        email: datos.get('correo'),
         mensaje: datos.get('mensaje')
       })
     });

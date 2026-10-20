@@ -1,13 +1,69 @@
-/* productos.js — Admin: tabla de productos y ventana para crear, editar o activar/desactivar. Requiere utils.js y comun.js. */
+/* productos.js — Admin: tabla de productos y ventana para crear, editar o activar/desactivar, con subida de imagen. Requiere utils.js y comun.js. */
 
 const tablaProductos = document.getElementById('tabla-productos');
 const formProducto = document.getElementById('form-producto');
 const listaCategorias = document.getElementById('categorias');
+const zonaImagen = document.getElementById('zona-imagen');
+const zonaPrevia = document.getElementById('zona-previa');
+const zonaTexto = document.getElementById('zona-texto');
+const entradaArchivo = document.getElementById('p-archivo');
+const TEXTO_ZONA = 'Arrastra una imagen aquí o haz clic para seleccionarla';
+const TIPOS_IMAGEN = ['image/jpeg', 'image/png', 'image/webp'];
+const MAX_BYTES = 2 * 1024 * 1024;
 let productos = [];
+let urlTemporal = null;
 
 function imagenAdmin(imagen) {
   const ruta = rutaImagen(imagen);
   return /^(https?:)?\/\//.test(ruta) || ruta.startsWith('/') ? ruta : '../' + ruta;
+}
+
+function mostrarPrevia(origen, texto = TEXTO_ZONA) {
+  if (urlTemporal) {
+    URL.revokeObjectURL(urlTemporal);
+    urlTemporal = null;
+  }
+  zonaPrevia.hidden = !origen;
+  if (origen) zonaPrevia.src = origen;
+  zonaTexto.textContent = texto;
+}
+
+function elegirArchivo(archivo) {
+  if (!archivo) return;
+  if (!TIPOS_IMAGEN.includes(archivo.type)) {
+    mostrarToast('Usa una imagen JPG, PNG o WebP', 'error');
+    return;
+  }
+  if (archivo.size > MAX_BYTES) {
+    mostrarToast('La imagen no debe superar 2 MB', 'error');
+    return;
+  }
+
+  const transferencia = new DataTransfer();
+  transferencia.items.add(archivo);
+  entradaArchivo.files = transferencia.files;
+
+  mostrarPrevia(null);
+  urlTemporal = URL.createObjectURL(archivo);
+  zonaPrevia.src = urlTemporal;
+  zonaPrevia.hidden = false;
+  zonaTexto.textContent = archivo.name;
+}
+
+async function subirImagen(archivo) {
+  const datos = new FormData();
+  datos.append('imagen', archivo);
+  const res = await fetch(API_ADMIN + 'subir_imagen.php', { method: 'POST', body: datos });
+
+  let respuesta = null;
+  try { respuesta = await res.json(); } catch { respuesta = null; }
+
+  if (res.status === 401 || res.status === 403) {
+    window.location.href = URL_LOGIN;
+    throw new Error('Sesión no válida');
+  }
+  if (!res.ok) throw new Error((respuesta && respuesta.error) || 'No se pudo subir la imagen');
+  return respuesta.ruta;
 }
 
 async function cargarProductos() {
@@ -60,6 +116,12 @@ function abrirFormulario(producto) {
     }
     formProducto.elements.activo.value = Number(producto.activo) === 1 ? '1' : '0';
   }
+
+  if (producto && producto.imagen) {
+    mostrarPrevia(imagenAdmin(producto.imagen), 'Arrastra otra imagen o haz clic para cambiarla');
+  } else {
+    mostrarPrevia(null);
+  }
   abrirModal('modal-producto');
 }
 
@@ -82,21 +144,25 @@ async function guardarProducto(e) {
   e.preventDefault();
   const f = formProducto.elements;
   const id = Number(f.id.value);
-  const cuerpo = {
-    nombre: f.nombre.value.trim(),
-    descripcion: f.descripcion.value.trim(),
-    precio: Number(f.precio.value),
-    stock: Number(f.stock.value),
-    unidad: f.unidad.value.trim(),
-    categoria: f.categoria.value.trim(),
-    imagen: f.imagen.value.trim(),
-    activo: Number(f.activo.value)
-  };
-  if (id) cuerpo.id = id;
-
   const boton = formProducto.querySelector('[type="submit"]');
   boton.disabled = true;
+
   try {
+    const archivo = f.archivo.files[0];
+    const imagen = archivo ? await subirImagen(archivo) : f.imagen.value.trim();
+
+    const cuerpo = {
+      nombre: f.nombre.value.trim(),
+      descripcion: f.descripcion.value.trim(),
+      precio: Number(f.precio.value),
+      stock: Number(f.stock.value),
+      unidad: f.unidad.value.trim(),
+      categoria: f.categoria.value.trim(),
+      imagen,
+      activo: Number(f.activo.value)
+    };
+    if (id) cuerpo.id = id;
+
     await api('productos.php', { method: id ? 'PUT' : 'POST', cuerpo });
     cerrarModal('modal-producto');
     mostrarToast(id ? 'Producto actualizado' : 'Producto creado');
@@ -127,6 +193,30 @@ tablaProductos.addEventListener('click', e => {
   if (boton.dataset.accion === 'editar') abrirFormulario(producto);
   if (boton.dataset.accion === 'estado') cambiarEstado(producto);
 });
+
+zonaImagen.addEventListener('click', () => entradaArchivo.click());
+
+zonaImagen.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    entradaArchivo.click();
+  }
+});
+
+zonaImagen.addEventListener('dragover', e => {
+  e.preventDefault();
+  zonaImagen.classList.add('arrastrando');
+});
+
+zonaImagen.addEventListener('dragleave', () => zonaImagen.classList.remove('arrastrando'));
+
+zonaImagen.addEventListener('drop', e => {
+  e.preventDefault();
+  zonaImagen.classList.remove('arrastrando');
+  elegirArchivo(e.dataTransfer.files[0]);
+});
+
+entradaArchivo.addEventListener('change', () => elegirArchivo(entradaArchivo.files[0]));
 
 document.getElementById('btn-nuevo').addEventListener('click', () => abrirFormulario(null));
 formProducto.addEventListener('submit', guardarProducto);

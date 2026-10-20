@@ -1,153 +1,154 @@
-/* productos.js — Admin: tabla de productos y ventana para crear, editar o activar/desactivar, con subida de imagen. Requiere utils.js y comun.js. */
+<?php
+/*
+ * php/productos.php — Catálogo de productos.
+ *   GET           Público: productos activos.
+ *   GET ?todos=1  Admin: todos, incluidos los inactivos.
+ *   POST          Admin: crea un producto.
+ *   PUT           Admin: actualiza un producto (el id va en el cuerpo JSON).
+ * Un producto no se borra: se desactiva (activo = 0).
+ * Requiere de db.php: $pdo y fallar(); de auth.php: requerir_rol().
+ */
 
-const tablaProductos = document.getElementById('tabla-productos');
-const formProducto = document.getElementById('form-producto');
-const listaCategorias = document.getElementById('categorias');
-let productos = [];
+require_once __DIR__ . '/config/db.php';
+require_once __DIR__ . '/includes/auth.php';
 
-function imagenAdmin(imagen) {
-  const ruta = rutaImagen(imagen);
-  return /^(https?:)?\/\//.test(ruta) || ruta.startsWith('/') ? ruta : '../' + ruta;
-}
+const PRECIO_MAX = 999999.99;
+const STOCK_MAX = 1000000;
 
-async function subirImagen(archivo) {
-  const datos = new FormData();
-  datos.append('imagen', archivo);
-  const res = await fetch(API_ADMIN + 'subir_imagen.php', { method: 'POST', body: datos });
-
-  let respuesta = null;
-  try { respuesta = await res.json(); } catch { respuesta = null; }
-
-  if (res.status === 401 || res.status === 403) {
-    window.location.href = URL_LOGIN;
-    throw new Error('Sesión no válida');
-  }
-  if (!res.ok) throw new Error((respuesta && respuesta.error) || 'No se pudo subir la imagen');
-  return respuesta.ruta;
-}
-
-async function cargarProductos() {
-  try {
-    const datos = await api('productos.php?todos=1');
-    productos = Array.isArray(datos) ? datos : datos.productos;
-    pintarTabla();
-  } catch (err) {
-    tablaProductos.innerHTML = `<tr><td colspan="7" class="admin-vacio">${escaparHTML(err.message)}</td></tr>`;
-  }
-}
-
-function pintarTabla() {
-  listaCategorias.innerHTML = [...new Set(productos.map(p => p.categoria))]
-    .map(c => `<option value="${escaparHTML(c)}"></option>`).join('');
-
-  if (!productos.length) {
-    tablaProductos.innerHTML = '<tr><td colspan="7" class="admin-vacio">Aún no hay productos.</td></tr>';
-    return;
-  }
-
-  tablaProductos.innerHTML = productos.map(p => {
-    const activo = Number(p.activo) === 1;
-    return `
-      <tr>
-        <td><img class="tabla-miniatura" src="${escaparHTML(imagenAdmin(p.imagen))}" alt="" loading="lazy"></td>
-        <td><strong>${escaparHTML(p.nombre)}</strong></td>
-        <td><span class="etiqueta">${escaparHTML(p.categoria)}</span></td>
-        <td>${formatearPrecio(p.precio)} / ${escaparHTML(p.unidad)}</td>
-        <td>${Number(p.stock)}</td>
-        <td><span class="etiqueta ${activo ? 'etiqueta-ok' : 'etiqueta-off'}">${activo ? 'Activo' : 'Inactivo'}</span></td>
-        <td>
-          <div class="acciones">
-            <button type="button" class="btn btn-chico btn-secundario" data-accion="editar" data-id="${Number(p.id)}">Editar</button>
-            <button type="button" class="btn btn-chico ${activo ? 'btn-peligro' : ''}" data-accion="estado" data-id="${Number(p.id)}">${activo ? 'Desactivar' : 'Activar'}</button>
-          </div>
-        </td>
-      </tr>`;
-  }).join('');
-}
-
-function abrirFormulario(producto) {
-  formProducto.reset();
-  document.getElementById('modal-titulo').textContent = producto ? 'Editar producto' : 'Nuevo producto';
-  formProducto.elements.id.value = producto ? producto.id : '';
-
-  if (producto) {
-    for (const campo of ['nombre', 'descripcion', 'precio', 'stock', 'unidad', 'categoria', 'imagen']) {
-      formProducto.elements[campo].value = producto[campo] ?? '';
+function leerJson(): array
+{
+    $datos = json_decode(file_get_contents('php://input'), true);
+    if (!is_array($datos)) {
+        fallar('Datos inválidos', 400);
     }
-    formProducto.elements.activo.value = Number(producto.activo) === 1 ? '1' : '0';
-  }
-  abrirModal('modal-producto');
+    return $datos;
 }
 
-function cuerpoProducto(p, cambios = {}) {
-  return {
-    id: Number(p.id),
-    nombre: p.nombre,
-    descripcion: p.descripcion || '',
-    precio: Number(p.precio),
-    stock: Number(p.stock),
-    unidad: p.unidad,
-    categoria: p.categoria,
-    imagen: p.imagen || '',
-    activo: Number(p.activo),
-    ...cambios
-  };
+function textoObligatorio($valor, int $max, string $campo): string
+{
+    if (!is_string($valor) || trim($valor) === '') {
+        fallar("El campo $campo es obligatorio", 400);
+    }
+    $valor = trim($valor);
+    if (mb_strlen($valor) > $max) {
+        fallar("El campo $campo no puede superar $max caracteres", 400);
+    }
+    return $valor;
 }
 
-async function guardarProducto(e) {
-  e.preventDefault();
-  const f = formProducto.elements;
-  const id = Number(f.id.value);
-  const boton = formProducto.querySelector('[type="submit"]');
-  boton.disabled = true;
-
-  try {
-    const archivo = f.archivo.files[0];
-    const imagen = archivo ? await subirImagen(archivo) : f.imagen.value.trim();
-
-    const cuerpo = {
-      nombre: f.nombre.value.trim(),
-      descripcion: f.descripcion.value.trim(),
-      precio: Number(f.precio.value),
-      stock: Number(f.stock.value),
-      unidad: f.unidad.value.trim(),
-      categoria: f.categoria.value.trim(),
-      imagen,
-      activo: Number(f.activo.value)
-    };
-    if (id) cuerpo.id = id;
-
-    await api('productos.php', { method: id ? 'PUT' : 'POST', cuerpo });
-    cerrarModal('modal-producto');
-    mostrarToast(id ? 'Producto actualizado' : 'Producto creado');
-    await cargarProductos();
-  } catch (err) {
-    mostrarToast(err.message, 'error');
-  } finally {
-    boton.disabled = false;
-  }
+function textoOpcional($valor, int $max, string $campo): ?string
+{
+    if ($valor === null || $valor === '') {
+        return null;
+    }
+    if (!is_string($valor) || mb_strlen(trim($valor)) > $max) {
+        fallar("El campo $campo no es válido o supera $max caracteres", 400);
+    }
+    return trim($valor) === '' ? null : trim($valor);
 }
 
-async function cambiarEstado(producto) {
-  const activo = Number(producto.activo) === 1 ? 0 : 1;
-  try {
-    await api('productos.php', { method: 'PUT', cuerpo: cuerpoProducto(producto, { activo }) });
-    mostrarToast(activo ? 'Producto activado' : 'Producto desactivado');
-    await cargarProductos();
-  } catch (err) {
-    mostrarToast(err.message, 'error');
-  }
+function leerProducto(array $d): array
+{
+    $precio = filter_var($d['precio'] ?? null, FILTER_VALIDATE_FLOAT);
+    if ($precio === false || $precio < 0 || $precio > PRECIO_MAX) {
+        fallar('El precio debe ser un número entre 0 y ' . PRECIO_MAX, 400);
+    }
+
+    $stock = filter_var($d['stock'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => STOCK_MAX]]);
+    if ($stock === false) {
+        fallar('El stock debe ser un entero entre 0 y ' . STOCK_MAX, 400);
+    }
+
+    $activo = $d['activo'] ?? 1;
+    if (!in_array($activo, [0, 1, '0', '1', true, false], true)) {
+        fallar('Estado inválido', 400);
+    }
+
+    $imagen = textoOpcional($d['imagen'] ?? null, 255, 'imagen');
+    if ($imagen !== null
+        && (str_contains($imagen, '..') || !preg_match('#^(https://[^\s"\'<>]+|[A-Za-z0-9_\-./]+)$#', $imagen))) {
+        fallar('La ruta de la imagen no es válida', 400);
+    }
+
+    return [
+        'nombre'      => textoObligatorio($d['nombre'] ?? null, 100, 'nombre'),
+        'descripcion' => textoOpcional($d['descripcion'] ?? null, 1000, 'descripción'),
+        'precio'      => round($precio, 2),
+        'unidad'      => textoObligatorio($d['unidad'] ?? null, 30, 'unidad'),
+        'categoria'   => textoObligatorio($d['categoria'] ?? null, 50, 'categoría'),
+        'imagen'      => $imagen,
+        'stock'       => $stock,
+        'activo'      => (int) $activo,
+    ];
 }
 
-tablaProductos.addEventListener('click', e => {
-  const boton = e.target.closest('[data-accion]');
-  if (!boton) return;
-  const producto = productos.find(p => Number(p.id) === Number(boton.dataset.id));
-  if (!producto) return;
-  if (boton.dataset.accion === 'editar') abrirFormulario(producto);
-  if (boton.dataset.accion === 'estado') cambiarEstado(producto);
-});
+function listarProductos(PDO $pdo, bool $todos): array
+{
+    $sql = 'SELECT id, nombre, descripcion, precio, unidad, categoria, imagen, stock, activo FROM productos'
+         . ($todos ? '' : ' WHERE activo = 1')
+         . ' ORDER BY categoria, nombre';
+    $filas = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 
-document.getElementById('btn-nuevo').addEventListener('click', () => abrirFormulario(null));
-formProducto.addEventListener('submit', guardarProducto);
-adminListo.then(cargarProductos);
+    foreach ($filas as &$f) {
+        $f['id'] = (int) $f['id'];
+        $f['precio'] = (float) $f['precio'];
+        $f['stock'] = (int) $f['stock'];
+        $f['activo'] = (int) $f['activo'];
+    }
+    return $filas;
+}
+
+$metodo = $_SERVER['REQUEST_METHOD'];
+
+if ($metodo === 'GET') {
+    $todos = isset($_GET['todos']);
+    if ($todos) {
+        requerir_rol('admin');
+    }
+    echo json_encode(listarProductos($pdo, $todos), JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+if ($metodo === 'POST') {
+    requerir_rol('admin');
+    $p = leerProducto(leerJson());
+
+    $stmt = $pdo->prepare(
+        'INSERT INTO productos (nombre, descripcion, precio, unidad, categoria, imagen, stock, activo)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+    );
+    $stmt->execute([$p['nombre'], $p['descripcion'], $p['precio'], $p['unidad'], $p['categoria'], $p['imagen'], $p['stock'], $p['activo']]);
+
+    http_response_code(201);
+    echo json_encode(['ok' => true, 'id' => (int) $pdo->lastInsertId()]);
+    exit;
+}
+
+if ($metodo === 'PUT') {
+    requerir_rol('admin');
+    $datos = leerJson();
+
+    $id = filter_var($datos['id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+    if ($id === false) {
+        fallar('ID inválido', 400);
+    }
+    $p = leerProducto($datos);
+
+    $existe = $pdo->prepare('SELECT 1 FROM productos WHERE id = ?');
+    $existe->execute([$id]);
+    if (!$existe->fetchColumn()) {
+        fallar('Producto no encontrado', 404);
+    }
+
+    $stmt = $pdo->prepare(
+        'UPDATE productos
+         SET nombre = ?, descripcion = ?, precio = ?, unidad = ?, categoria = ?, imagen = ?, stock = ?, activo = ?
+         WHERE id = ?'
+    );
+    $stmt->execute([$p['nombre'], $p['descripcion'], $p['precio'], $p['unidad'], $p['categoria'], $p['imagen'], $p['stock'], $p['activo'], $id]);
+
+    echo json_encode(['ok' => true]);
+    exit;
+}
+
+fallar('Método no permitido', 405);

@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Productos — Administración Pan Clásico</title>
   <link rel="stylesheet" href="../css/admin.css">
 </head>
+
 <body class="admin-body">
   <aside class="admin-lateral" id="admin-menu"></aside>
 
@@ -71,19 +73,22 @@
         </div>
       </div>
 
-      <div class="campos-duo">
-        <div class="campo">
-          <label for="p-archivo">Imagen (JPG, PNG o WebP, máx. 2 MB)</label>
-          <input type="file" id="p-archivo" name="archivo" accept="image/jpeg,image/png,image/webp">
-          <input type="hidden" name="imagen">
+      <div class="campo">
+        <label>Imagen del producto (JPG, PNG o WebP, máx. 2 MB)</label>
+        <div class="zona-imagen" id="zona-imagen" tabindex="0" role="button" aria-label="Seleccionar imagen">
+          <img id="zona-previa" class="zona-previa" alt="" hidden>
+          <span id="zona-texto">Arrastra una imagen aquí o haz clic para seleccionarla</span>
         </div>
-        <div class="campo">
-          <label for="p-activo">Estado</label>
-          <select id="p-activo" name="activo">
-            <option value="1">Activo</option>
-            <option value="0">Inactivo</option>
-          </select>
-        </div>
+        <input type="file" id="p-archivo" name="archivo" accept="image/jpeg,image/png,image/webp" hidden>
+        <input type="hidden" name="imagen">
+      </div>
+
+      <div class="campo">
+        <label for="p-activo">Estado</label>
+        <select id="p-activo" name="activo">
+          <option value="1">Activo</option>
+          <option value="0">Inactivo</option>
+        </select>
       </div>
 
       <div class="modal-acciones">
@@ -97,4 +102,5 @@
   <script src="../js/admin/comun.js"></script>
   <script src="../js/admin/productos.js"></script>
 </body>
+
 </html>
