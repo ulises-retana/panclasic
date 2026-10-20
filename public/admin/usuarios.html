@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Usuarios — Administración Pan Clásico</title>
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body class="admin-body">
+  <aside class="admin-lateral" id="admin-menu"></aside>
+
+  <main class="admin-main">
+    <div class="admin-cabecera">
+      <h1>Usuarios</h1>
+    </div>
+
+    <div class="tabla-caja">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Registro</th>
+            <th>Rol</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-usuarios"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script src="../js/utils.js"></script>
+  <script src="../js/admin/comun.js"></script>
+  <script src="../js/admin/usuarios.js"></script>
+</body>
+</html>

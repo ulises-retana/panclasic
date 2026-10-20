@@ -1,0 +1,528 @@
+/* admin.css — Estilos del panel de administración (separados del CSS público). */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --color-primary: #5a321f;
+    --color-primary-dark: #442415;
+    --color-accent: #b86b28;
+    --color-accent-hover: #9c551c;
+    --color-gold: #d99a4e;
+    --color-cream: #fff8ed;
+    --color-cream-light: #fffdf9;
+    --color-text: #3d2618;
+    --color-text-muted: #7d6556;
+    --color-border: #ead8c0;
+    --color-border-light: #fae8d4;
+    --color-ok: #216b43;
+    --color-ok-bg: #e8f5ec;
+    --color-error: #c0392b;
+    --color-error-bg: #fdeeed;
+    --shadow-soft: 0 4px 18px rgba(90, 50, 31, 0.08);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-main);
+    background: var(--color-cream);
+    color: var(--color-text);
+    -webkit-font-smoothing: antialiased;
+}
+
+.admin-body:not(.admin-listo) {
+    visibility: hidden;
+}
+
+.admin-body {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    min-height: 100vh;
+}
+
+/* Menú lateral */
+
+.admin-lateral {
+    background: linear-gradient(180deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+    color: #faeedd;
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+}
+
+.admin-marca {
+    font-size: 21px;
+    font-weight: 800;
+    color: #fff8ed;
+    padding: 0 10px;
+}
+
+.admin-marca small {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--color-gold);
+    margin-top: 2px;
+}
+
+.admin-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.admin-nav a {
+    color: #faeedd;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 11px 14px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s ease;
+}
+
+.admin-nav a:hover {
+    background: rgba(217, 154, 78, 0.25);
+}
+
+.admin-nav a.activo {
+    background: var(--color-gold);
+    color: var(--color-primary-dark);
+    font-weight: 700;
+}
+
+.admin-usuario {
+    border-top: 1px solid rgba(250, 238, 221, 0.2);
+    padding: 16px 10px 0;
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.admin-usuario strong {
+    display: block;
+    color: #fff8ed;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-usuario button {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff8ed;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 12px;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.admin-usuario button:hover {
+    background: rgba(255, 255, 255, 0.22);
+}
+
+/* Contenido */
+
+.admin-main {
+    padding: 36px 40px 60px;
+    min-width: 0;
+}
+
+.admin-cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 26px;
+}
+
+.admin-cabecera h1 {
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--color-primary);
+    letter-spacing: -0.5px;
+}
+
+.admin-vacio {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--color-text-muted);
+}
+
+/* Botones */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--color-accent);
+    color: #fff;
+    border: none;
+    border-radius: 9px;
+    padding: 10px 18px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.btn:hover:not(:disabled) {
+    background: var(--color-accent-hover);
+    transform: translateY(-1px);
+}
+
+.btn:disabled {
+    background: #d1c0b3;
+    color: #7b695c;
+    cursor: not-allowed;
+}
+
+.btn-secundario {
+    background: #f4e5d4;
+    color: var(--color-primary);
+}
+
+.btn-secundario:hover:not(:disabled) {
+    background: var(--color-border);
+}
+
+.btn-peligro {
+    background: var(--color-error);
+}
+
+.btn-peligro:hover:not(:disabled) {
+    background: #962d22;
+}
+
+.btn-chico {
+    padding: 6px 12px;
+    font-size: 13px;
+}
+
+/* Tablas */
+
+.tabla-caja {
+    background: #fff;
+    border: 1px solid var(--color-border-light);
+    border-radius: 14px;
+    box-shadow: var(--shadow-soft);
+    overflow-x: auto;
+}
+
+.tabla {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.tabla th {
+    text-align: left;
+    padding: 14px 16px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    background: var(--color-cream-light);
+    border-bottom: 2px solid #f1d3a5;
+    white-space: nowrap;
+}
+
+.tabla td {
+    padding: 13px 16px;
+    border-bottom: 1px solid #f6ecdf;
+    vertical-align: middle;
+}
+
+.tabla tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.tabla tbody tr:hover {
+    background: var(--color-cream-light);
+}
+
+.tabla .derecha {
+    text-align: right;
+}
+
+.tabla .acciones {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.tabla-miniatura {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: #faeedd;
+}
+
+/* Etiquetas */
+
+.etiqueta {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #f4e5d4;
+    color: var(--color-primary);
+}
+
+.etiqueta-ok {
+    background: var(--color-ok-bg);
+    color: var(--color-ok);
+}
+
+.etiqueta-off {
+    background: var(--color-error-bg);
+    color: var(--color-error);
+}
+
+/* Formularios */
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.campo label {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    font: inherit;
+    font-size: 14px;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(184, 107, 40, 0.15);
+}
+
+.campo textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.campos-duo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.tabla select {
+    padding: 6px 10px;
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    font: inherit;
+    font-size: 13px;
+    background: #fff;
+}
+
+/* Ventanas (dialog) */
+
+dialog {
+    margin: auto;
+    width: min(560px, calc(100% - 32px));
+    max-height: calc(100vh - 40px);
+    padding: 0;
+    border: none;
+    border-top: 6px solid var(--color-accent);
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    color: var(--color-text);
+    overflow: auto;
+}
+
+dialog::backdrop {
+    background: rgba(40, 20, 10, 0.65);
+    backdrop-filter: blur(4px);
+}
+
+.modal-cuerpo {
+    padding: 26px;
+}
+
+.modal-cuerpo h2 {
+    font-size: 22px;
+    color: var(--color-primary);
+    margin-bottom: 18px;
+}
+
+.modal-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Tarjetas de resumen */
+
+.resumen-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.resumen-tarjeta {
+    display: block;
+    background: #fff;
+    border: 1px solid var(--color-border-light);
+    border-radius: 14px;
+    box-shadow: var(--shadow-soft);
+    padding: 24px;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.resumen-tarjeta:hover {
+    transform: translateY(-3px);
+    border-color: var(--color-gold);
+}
+
+.resumen-tarjeta span {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.resumen-tarjeta strong {
+    display: block;
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--color-primary);
+    margin-top: 6px;
+}
+
+/* Avisos (toast) */
+
+.toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+.toast {
+    pointer-events: auto;
+    background: var(--color-primary);
+    color: #fff;
+    padding: 14px 20px;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    max-width: 360px;
+    border-left: 5px solid var(--color-gold);
+    transform: translateX(120%);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.toast.mostrar {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.toast-exito {
+    border-left-color: #27ae60;
+}
+
+.toast-aviso {
+    border-left-color: #f39c12;
+}
+
+.toast-error {
+    border-left-color: #e74c3c;
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+    .admin-body {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-lateral {
+        position: static;
+        height: auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+    }
+
+    .admin-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+        flex: 1 1 100%;
+        order: 3;
+    }
+
+    .admin-usuario {
+        border: none;
+        padding: 0;
+        margin-left: auto;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .admin-main {
+        padding: 24px 16px 48px;
+    }
+
+    .campos-duo {
+        grid-template-columns: 1fr;
+    }
+}

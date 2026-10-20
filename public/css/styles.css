@@ -74,8 +74,6 @@ body > header {
     padding: 16px 30px;
 }
 
-/* LOGO */
-
 .logo {
     color: #fff8ed;
     font-size: 24px;
@@ -91,8 +89,6 @@ body > header {
 .logo:hover {
     transform: scale(1.02);
 }
-
-/* MENÚ */
 
 .menu {
     list-style: none;
@@ -126,7 +122,6 @@ body > header {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
 }
 
-/* Enlace e icono del Carrito con Badge */
 .nav-cart-link,
 .menu li a[href*="carrito.html"] {
     position: relative;
@@ -167,7 +162,6 @@ body > header {
     pointer-events: none;
 }
 
-
 /* ========================================
    PÁGINA DE INICIO (HERO)
 ======================================== */
@@ -183,8 +177,6 @@ body > header {
     gap: 40px;
     position: relative;
 }
-
-/* TEXTO PRINCIPAL */
 
 .hero-text {
     max-width: 620px;
@@ -225,8 +217,6 @@ body > header {
     color: var(--color-text-muted);
     margin-bottom: 30px;
 }
-
-/* ICONO DECORATIVO CON ANIMACIÓN FLOTANTE */
 
 .hero-icon {
     font-size: 160px;
@@ -312,8 +302,6 @@ body > header {
     color: #553421;
 }
 
-/* TARJETAS */
-
 .tarjetas {
     max-width: 1150px;
     margin: 45px auto 0;
@@ -358,27 +346,21 @@ body > header {
     color: var(--color-text-muted);
 }
 
-
 /* ========================================
    PÁGINAS INTERNAS
 ======================================== */
 
 .pagina {
     min-height: 650px;
-
     max-width: 1100px;
-
     margin: auto;
-
     padding: 70px 30px;
-
     text-align: center;
 }
 
 .pagina h1 {
     font-size: 42px;
     color: #5a321f;
-
     margin-bottom: 15px;
 }
 
@@ -386,9 +368,8 @@ body > header {
     font-size: 18px;
 }
 
-
 /* ========================================
-   CARRITO Y CHECKOUT (PASOS 7 Y 8)
+   CARRITO Y CHECKOUT
 ======================================== */
 
 .pagina-carrito {
@@ -415,7 +396,6 @@ body > header {
     margin: auto;
 }
 
-/* Grilla de 2 columnas */
 .carrito-contenedor-grid {
     display: grid;
     grid-template-columns: 1.55fr 1fr;
@@ -423,7 +403,6 @@ body > header {
     align-items: flex-start;
 }
 
-/* Columna de Productos */
 .carrito-caja {
     background-color: #ffffff;
     border-radius: 14px;
@@ -432,7 +411,6 @@ body > header {
     padding: 24px;
 }
 
-/* Carrito Vacío */
 .carrito-vacio {
     text-align: center;
     padding: 50px 20px;
@@ -461,7 +439,6 @@ body > header {
     padding: 12px 28px;
 }
 
-/* Encabezado de la tabla */
 .carrito-tabla-header {
     display: grid;
     grid-template-columns: 2fr 1fr 1.2fr 1fr 40px;
@@ -478,7 +455,6 @@ body > header {
 .col-derecha { text-align: right; }
 .col-accion { text-align: center; }
 
-/* Items del carrito */
 .carrito-lista {
     display: flex;
     flex-direction: column;
@@ -544,7 +520,6 @@ body > header {
     font-size: 16px;
 }
 
-/* Control de Cantidad (+ / -) */
 .cantidad-control {
     display: inline-flex;
     align-items: center;
@@ -595,7 +570,6 @@ body > header {
     transform: scale(1.15);
 }
 
-/* Pie del carrito */
 .carrito-acciones-pie {
     display: flex;
     justify-content: space-between;
@@ -629,7 +603,6 @@ body > header {
     text-decoration: underline;
 }
 
-/* Columna de Checkout */
 .checkout-card {
     background: #ffffff;
     border-radius: 14px;
@@ -680,13 +653,13 @@ body > header {
 .fila-total {
     font-size: 18px;
     font-weight: 700;
+}
 
 .total-destacado {
     font-size: 24px;
     color: #b86b28;
 }
 
-/* Formulario */
 .form-checkout {
     display: flex;
     flex-direction: column;
@@ -702,6 +675,7 @@ body > header {
 .campo-grupo label {
     font-size: 13px;
     font-weight: 700;
+}
 
 .campo-grupo input,
 .campo-grupo textarea {
@@ -720,7 +694,6 @@ body > header {
     border-color: #b86b28;
 }
 
-/* Opciones de Método de Pago */
 .metodos-pago-opciones {
     display: flex;
     flex-direction: column;
@@ -753,13 +726,13 @@ body > header {
     display: flex;
     flex-direction: column;
     font-size: 14px;
+}
 
 .metodo-info small {
     font-size: 12px;
     color: #8c6e5a;
 }
 
-/* Bloque datos de tarjeta */
 .datos-tarjeta-box {
     background: #fff8ed;
     border: 2px dashed #ead8c0;
@@ -777,7 +750,6 @@ body > header {
     gap: 10px;
 }
 
-/* Botón Final */
 .btn-confirmar-compra {
     width: 100%;
     padding: 14px;
@@ -793,7 +765,7 @@ body > header {
     margin-top: 5px;
 }
 
-/* Modal del Ticket */
+/* Modal del ticket */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -868,6 +840,7 @@ body > header {
     display: flex;
     justify-content: space-between;
     margin-bottom: 6px;
+}
 
 .ticket-separador {
     height: 1px;
@@ -927,80 +900,36 @@ body > header {
     background: #d9bf9e;
 }
 
-/* Responsividad para Carrito */
-@media (max-width: 900px) {
-    .carrito-contenedor-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .carrito-tabla-header {
-        display: none;
-    }
-
-    .carrito-item {
-        grid-template-columns: 1fr auto;
-        grid-template-areas:
-            "info accion"
-            "precio subtotal"
-            "cant cant";
-        gap: 10px;
-        padding: 14px 0;
-    }
-
-    .cart-item-info { grid-area: info; }
-    .cart-item-accion { grid-area: accion; }
-    .cart-item-precio { grid-area: precio; text-align: left; }
-    .cart-item-subtotal { grid-area: subtotal; text-align: right; }
-    .cart-item-cantidad { grid-area: cant; text-align: left; }
-}
-
-
 /* ========================================
    CONTACTO
 ======================================== */
 
 .contacto {
     max-width: 1100px;
-
     min-height: 650px;
-
     margin: auto;
-
     padding: 70px 30px;
-
     display: grid;
-
     grid-template-columns: 1fr 1fr;
-
     gap: 60px;
-
     align-items: center;
 }
 
-
-/* INFORMACIÓN */
-
 .contacto-info h1 {
     font-size: 48px;
-
     color: #5a321f;
-
     margin-bottom: 20px;
 }
 
 .contacto-info > p {
     line-height: 1.7;
-
     margin-bottom: 30px;
 }
 
 .dato {
     display: flex;
-
     align-items: center;
-
     gap: 15px;
-
     margin: 20px 0;
 }
 
@@ -1008,49 +937,32 @@ body > header {
     font-size: 28px;
 }
 
-
-/* ========================================
-   FORMULARIO
-======================================== */
-
 .formulario {
     background-color: white;
-
     padding: 35px;
-
     border-radius: 15px;
-
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
 }
 
 .formulario form {
     display: flex;
-
     flex-direction: column;
-
     gap: 10px;
 }
 
 .formulario label {
     font-weight: bold;
-
     margin-top: 10px;
 }
 
 .formulario input,
 .formulario textarea {
     width: 100%;
-
     padding: 13px;
-
     border: 2px solid #ead8c0;
-
     border-radius: 8px;
-
     font-size: 15px;
-
     font-family: Arial, Helvetica, sans-serif;
-
     outline: none;
 }
 
@@ -1067,9 +979,8 @@ body > header {
     margin-top: 15px;
 }
 
-
 /* ========================================
-   CATÁLOGO DE PRODUCTOS (PASOS 5 Y 6)
+   CATÁLOGO DE PRODUCTOS
 ======================================== */
 
 .catalogo-pagina {
@@ -1097,7 +1008,6 @@ body > header {
     line-height: 1.7;
 }
 
-/* Buscador */
 .catalogo-toolbar {
     margin: 0 auto 22px;
     max-width: 620px;
@@ -1165,7 +1075,6 @@ body > header {
     color: white;
 }
 
-/* Mensaje y Spinner de Carga */
 .mensaje-carga-box {
     margin: 46px auto;
     display: flex;
@@ -1192,7 +1101,6 @@ body > header {
     100% { transform: rotate(360deg); }
 }
 
-/* Filtros de Categoría */
 .catalogo-filtros {
     display: flex;
     justify-content: center;
@@ -1228,7 +1136,6 @@ body > header {
     box-shadow: 0 3px 9px rgba(90, 50, 31, 0.2);
 }
 
-/* Grilla de Productos */
 .productos-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
@@ -1236,7 +1143,6 @@ body > header {
     text-align: left;
 }
 
-/* Tarjeta Individual */
 .producto-card {
     background-color: var(--color-cream-light);
     border-radius: 16px;
@@ -1360,7 +1266,6 @@ body > header {
     background-color: #fdeeed;
 }
 
-/* Botón agregar */
 .btn-agregar-carrito {
     width: 100%;
     min-height: 48px;
@@ -1401,7 +1306,6 @@ body > header {
     opacity: 0.82;
 }
 
-/* Mensajes Vacío y Error */
 .catalogo-vacio,
 .catalogo-error {
     grid-column: 1 / -1;
@@ -1443,59 +1347,6 @@ body > header {
     outline-offset: 3px;
 }
 
-@media (max-width: 600px) {
-    .catalogo-pagina {
-        padding: 40px 18px 52px;
-    }
-
-    .catalogo-header {
-        margin-bottom: 26px;
-    }
-
-    .catalogo-header h1 {
-        letter-spacing: -0.6px;
-    }
-
-    .catalogo-subtitulo {
-        font-size: 15px;
-    }
-
-    .catalogo-toolbar {
-        margin-bottom: 18px;
-    }
-
-    .buscador-box {
-        min-height: 50px;
-        padding-left: 14px;
-    }
-
-    .buscador-box input {
-        font-size: 14px;
-    }
-
-    .catalogo-filtros {
-        justify-content: flex-start;
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        padding: 2px 2px 10px;
-        margin-bottom: 22px;
-        scrollbar-width: thin;
-    }
-
-    .filtro-btn {
-        flex: 0 0 auto;
-    }
-
-    .productos-grid {
-        grid-template-columns: 1fr;
-        gap: 18px;
-    }
-
-    .producto-img-wrap {
-        height: 220px;
-    }
-}
-
 @media (prefers-reduced-motion: reduce) {
     .producto-card,
     .producto-img,
@@ -1505,7 +1356,10 @@ body > header {
     }
 }
 
-/* Notificaciones Toast */
+/* ========================================
+   NOTIFICACIONES (TOAST)
+======================================== */
+
 .toast-container {
     position: fixed;
     bottom: 24px;
@@ -1560,7 +1414,6 @@ body > header {
 .toast-mensaje {
     line-height: 1.4;
 }
-
 
 /* ========================================
    PIE DE PÁGINA
@@ -1622,76 +1475,8 @@ footer {
 }
 
 /* ========================================
-   DISEÑO PARA CELULARES
+   PANTALLA DE LOGIN Y REGISTRO
 ======================================== */
-
-@media (max-width: 768px) {
-
-    .navbar {
-        flex-direction: column;
-        gap: 14px;
-        padding: 16px 20px;
-    }
-
-    .menu {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 6px;
-    }
-
-    .menu li a {
-        padding: 7px 13px;
-        font-size: 14px;
-    }
-
-    .hero {
-        flex-direction: column;
-        text-align: center;
-        padding: 50px 20px;
-        gap: 35px;
-    }
-
-    .hero-text {
-        max-width: 100%;
-    }
-
-    .hero h1 {
-        font-size: 46px;
-    }
-
-    .hero h2 {
-        font-size: 22px;
-    }
-
-    .hero-icon {
-        width: 220px;
-        height: 220px;
-        font-size: 110px;
-    }
-
-    .tarjetas {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-
-    .contacto {
-        grid-template-columns: 1fr;
-        gap: 30px;
-        padding: 40px 20px;
-    }
-
-    .toast-container {
-        left: 20px;
-        right: 20px;
-        bottom: 20px;
-        max-width: none;
-    }
-
-}
-
-/* =========================================================
-   PANTALLA DE LOGIN
-   ========================================================= */
 
 .login-body {
     min-height: 100vh;
@@ -1769,6 +1554,7 @@ footer {
 .login-campo label {
     font-size: 13px;
     font-weight: bold;
+}
 
 .login-input-wrap {
     position: relative;
@@ -1839,27 +1625,6 @@ footer {
     border: 1px solid #d4efdf;
 }
 
-
-.enlace-volver {
-    display: inline-block;
-    margin-top: 20px;
-    color: #b86b28;
-    font-size: 14px;
-    text-decoration: none;
-    font-weight: bold;
-}
-.login-alerta-error {
-    background-color: #fdeeed;
-    color: #c0392b;
-    border: 1px solid #fadbd8;
-}
-
-.login-alerta-exito {
-    background-color: #eafaf1;
-    color: #27ae60;
-    border: 1px solid #d4efdf;
-}
-
 .enlace-volver {
     display: inline-block;
     margin-top: 20px;
@@ -1872,9 +1637,27 @@ footer {
 .enlace-volver:hover {
     text-decoration: underline;
 }
+.login-form[hidden] {
+    display: none;
+}
+
+.login-campo input.input-codigo {
+    text-align: center;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: 10px;
+    color: #5a321f;
+    background: #fff8ed;
+    padding-left: 24px;
+}
+
+.login-campo input.input-codigo::placeholder {
+    color: #d1c0b3;
+    letter-spacing: 10px;
+}
 
 /* ========================================
-   RESPONSIVE (PÚBLICO)
+   RESPONSIVE
 ======================================== */
 
 @media (max-width: 900px) {
@@ -1895,6 +1678,11 @@ footer {
         text-align: center;
         padding: 50px 24px;
         min-height: auto;
+        gap: 35px;
+    }
+
+    .hero-text {
+        max-width: 100%;
     }
 
     .hero h1 {
@@ -1909,20 +1697,55 @@ footer {
 
     .tarjetas {
         grid-template-columns: 1fr;
+        gap: 20px;
     }
 
     .carrito-contenedor-grid {
         grid-template-columns: 1fr;
     }
 
-    .carrito-tabla-header,
-    .carrito-item {
-        grid-template-columns: 2fr 1fr 1fr 40px;
+    .carrito-tabla-header {
+        display: none;
     }
 
-    .carrito-tabla-header .col-precio,
-    .carrito-item .cart-item-precio {
-        display: none;
+    .carrito-item {
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+            "info accion"
+            "precio subtotal"
+            "cant cant";
+        gap: 10px;
+        padding: 14px 0;
+    }
+
+    .cart-item-info { grid-area: info; }
+    .cart-item-accion { grid-area: accion; }
+    .cart-item-precio { grid-area: precio; text-align: left; }
+    .cart-item-subtotal { grid-area: subtotal; text-align: right; }
+    .cart-item-cantidad { grid-area: cant; text-align: left; }
+
+    .contacto {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        padding: 40px 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .menu li a {
+        padding: 7px 13px;
+        font-size: 14px;
+    }
+
+    .hero h2 {
+        font-size: 22px;
+    }
+
+    .toast-container {
+        left: 20px;
+        right: 20px;
+        bottom: 20px;
+        max-width: none;
     }
 }
 
@@ -1933,5 +1756,56 @@ footer {
 
     .login-card {
         padding: 28px 22px;
+    }
+
+    .catalogo-pagina {
+        padding: 40px 18px 52px;
+    }
+
+    .catalogo-header {
+        margin-bottom: 26px;
+    }
+
+    .catalogo-header h1 {
+        letter-spacing: -0.6px;
+    }
+
+    .catalogo-subtitulo {
+        font-size: 15px;
+    }
+
+    .catalogo-toolbar {
+        margin-bottom: 18px;
+    }
+
+    .buscador-box {
+        min-height: 50px;
+        padding-left: 14px;
+    }
+
+    .buscador-box input {
+        font-size: 14px;
+    }
+
+    .catalogo-filtros {
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding: 2px 2px 10px;
+        margin-bottom: 22px;
+        scrollbar-width: thin;
+    }
+
+    .filtro-btn {
+        flex: 0 0 auto;
+    }
+
+    .productos-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .producto-img-wrap {
+        height: 220px;
     }
 }

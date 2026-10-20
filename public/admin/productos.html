@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Productos — Administración Pan Clásico</title>
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body class="admin-body">
+  <aside class="admin-lateral" id="admin-menu"></aside>
+
+  <main class="admin-main">
+    <div class="admin-cabecera">
+      <h1>Productos</h1>
+      <button type="button" class="btn" id="btn-nuevo">+ Nuevo producto</button>
+    </div>
+
+    <div class="tabla-caja">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Estado</th>
+            <th class="derecha">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-productos"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <dialog id="modal-producto">
+    <form id="form-producto" class="modal-cuerpo">
+      <h2 id="modal-titulo">Nuevo producto</h2>
+      <input type="hidden" name="id">
+
+      <div class="campo">
+        <label for="p-nombre">Nombre</label>
+        <input type="text" id="p-nombre" name="nombre" maxlength="100" required>
+      </div>
+
+      <div class="campo">
+        <label for="p-descripcion">Descripción</label>
+        <textarea id="p-descripcion" name="descripcion" maxlength="1000"></textarea>
+      </div>
+
+      <div class="campos-duo">
+        <div class="campo">
+          <label for="p-precio">Precio</label>
+          <input type="number" id="p-precio" name="precio" min="0" max="999999.99" step="0.01" required>
+        </div>
+        <div class="campo">
+          <label for="p-stock">Stock</label>
+          <input type="number" id="p-stock" name="stock" min="0" step="1" required>
+        </div>
+      </div>
+
+      <div class="campos-duo">
+        <div class="campo">
+          <label for="p-unidad">Unidad</label>
+          <input type="text" id="p-unidad" name="unidad" maxlength="30" value="pieza" required>
+        </div>
+        <div class="campo">
+          <label for="p-categoria">Categoría</label>
+          <input type="text" id="p-categoria" name="categoria" maxlength="50" list="categorias" required>
+          <datalist id="categorias"></datalist>
+        </div>
+      </div>
+
+      <div class="campos-duo">
+        <div class="campo">
+          <label for="p-archivo">Imagen (JPG, PNG o WebP, máx. 2 MB)</label>
+          <input type="file" id="p-archivo" name="archivo" accept="image/jpeg,image/png,image/webp">
+          <input type="hidden" name="imagen">
+        </div>
+        <div class="campo">
+          <label for="p-activo">Estado</label>
+          <select id="p-activo" name="activo">
+            <option value="1">Activo</option>
+            <option value="0">Inactivo</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-acciones">
+        <button type="button" class="btn btn-secundario" data-cerrar>Cancelar</button>
+        <button type="submit" class="btn">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="../js/utils.js"></script>
+  <script src="../js/admin/comun.js"></script>
+  <script src="../js/admin/productos.js"></script>
+</body>
+</html>

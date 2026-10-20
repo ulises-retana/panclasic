@@ -145,6 +145,40 @@ CREATE TABLE IF NOT EXISTS mensajes (
 
 
 -- ----------------------------------------------------------------------------
+-- 5b. RECUPERACIONES (códigos para restablecer la contraseña)
+-- Se guarda solo el hash del código. Caduca a los 15 minutos y se bloquea
+-- tras 5 intentos fallidos.
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS recuperaciones (
+  id           INT UNSIGNED  NOT NULL AUTO_INCREMENT,
+  usuario_id   INT UNSIGNED  NOT NULL,
+  codigo_hash  VARCHAR(255)  NOT NULL,
+  intentos     TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  expira_en    DATETIME      NOT NULL,
+  creado_en    TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (id),
+  KEY idx_recuperaciones_usuario (usuario_id),
+  CONSTRAINT fk_recuperaciones_usuario
+    FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
+    ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE = InnoDB;
+
+-- ----------------------------------------------------------------------------
+-- 5c. INTENTOS_LOGIN (inicios de sesión fallidos, para frenar fuerza bruta)
+-- Se borran los de más de un día en cada fallo y los del usuario al entrar bien.
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS intentos_login (
+  id         INT UNSIGNED  NOT NULL AUTO_INCREMENT,
+  email      VARCHAR(150)  NOT NULL,
+  ip         VARCHAR(45)   NOT NULL,
+  creado_en  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (id),
+  KEY idx_intentos_email_ip (email, ip, creado_en),
+  KEY idx_intentos_ip (ip, creado_en)
+) ENGINE = InnoDB;
+-- ---------------------------------------------------------------------------
 -- 6. DATOS DE EJEMPLO
 -- Cada producto se inserta solo si no existe otro con el mismo nombre.
 -- Las imágenes quedan vacías: se asignan desde el panel de administración.

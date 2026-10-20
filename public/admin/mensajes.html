@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mensajes — Administración Pan Clásico</title>
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body class="admin-body">
+  <aside class="admin-lateral" id="admin-menu"></aside>
+
+  <main class="admin-main">
+    <div class="admin-cabecera">
+      <h1>Mensajes</h1>
+    </div>
+
+    <div class="tabla-caja">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Mensaje</th>
+            <th class="derecha">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-mensajes"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <dialog id="modal-mensaje">
+    <div class="modal-cuerpo">
+      <h2 id="mensaje-titulo">Mensaje</h2>
+      <div id="mensaje-detalle"></div>
+      <div class="modal-acciones">
+        <button type="button" class="btn btn-secundario" data-cerrar>Cerrar</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="modal-borrar">
+    <div class="modal-cuerpo">
+      <h2>Eliminar mensaje</h2>
+      <p>Esta acción no se puede deshacer.</p>
+      <div class="modal-acciones">
+        <button type="button" class="btn btn-secundario" data-cerrar>Cancelar</button>
+        <button type="button" class="btn btn-peligro" id="confirmar-borrar">Eliminar</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="../js/utils.js"></script>
+  <script src="../js/admin/comun.js"></script>
+  <script src="../js/admin/mensajes.js"></script>
+</body>
+</html>

@@ -21,25 +21,25 @@
 
     <main class="login-main">
         <div class="login-card">
-            
+
             <span class="login-badge">Iniciar Sesión</span>
             <h1>Bienvenido de nuevo</h1>
-            <p class="subtexto">Accede con tu correo o nombre de usuario.</p>
+            <p class="subtexto">Accede con tu correo electrónico.</p>
 
             <div id="login-alerta" class="login-alerta" role="alert"></div>
 
             <form id="form-login" class="login-form">
-                
+
                 <div class="login-campo">
-                    <label for="identificador">Correo o Usuario</label>
+                    <label for="email">Correo electrónico</label>
                     <div class="login-input-wrap">
-                        <input 
-                            type="text" 
-                            id="identificador" 
-                            name="identificador" 
-                            placeholder="correo@ejemplo.com o usuario"
-                            autocomplete="username" 
-                            required 
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="correo@ejemplo.com"
+                            autocomplete="email"
+                            required
                             autofocus
                         >
                     </div>
@@ -48,12 +48,12 @@
                 <div class="login-campo">
                     <label for="password">Contraseña</label>
                     <div class="login-input-wrap">
-                        <input 
-                            type="password" 
-                            id="password" 
-                            name="password" 
-                            placeholder="••••••••" 
-                            autocomplete="current-password" 
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="••••••••"
+                            autocomplete="current-password"
                             required
                         >
                         <button type="button" id="btn-toggle-pass" class="btn-toggle-pass" aria-label="Mostrar u ocultar contraseña">👁️</button>
@@ -81,7 +81,7 @@
         <p>© 2026 Pan Clásico - Todos los derechos reservados</p>
     </footer>
 
-   <script src="js/auth.js"></script>
+    <script src="js/auth.js"></script>
 
 </body>
 
