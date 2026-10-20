@@ -54,8 +54,8 @@ if (formRegistro) {
     e.preventDefault();
     const datos = new FormData(formRegistro);
 
-    if (datos.has('confirmar') && datos.get('password') !== datos.get('confirmar')) {
-      mostrarToast('Las contraseñas no coinciden', 'error');
+    if (datos.has('password2') && datos.get('password') !== datos.get('password2')) {
+    mostrarToast('Las contraseñas no coinciden', 'error');
       return;
     }
 

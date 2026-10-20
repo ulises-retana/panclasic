@@ -20,8 +20,13 @@ function escaparHTML(valor) {
 /* ---------- Avisos ---------- */
 
 function mostrarToast(mensaje, tipo = 'exito') {
-    const contenedor = document.getElementById('toast-container');
-    if (!contenedor) return;
+    let contenedor = document.getElementById('toast-container');
+    if (!contenedor) {
+        contenedor = document.createElement('div');
+        contenedor.id = 'toast-container';
+        contenedor.className = 'toast-container';
+        document.body.appendChild(contenedor);
+    }
 
     const iconos = { exito: '✅', aviso: '⚠️', error: '❌' };
     const toast = document.createElement('div');
@@ -46,13 +51,10 @@ function mostrarToast(mensaje, tipo = 'exito') {
     }, 3000);
 }
 
-/* ---------- Precios ---------- */
-
-function formatoPrecio(valor) {
+function formatearPrecio(valor) {
     const numero = Number(valor);
     return '$' + (Number.isFinite(numero) ? numero : 0).toFixed(2);
 }
-
 /* ---------- Carrito ---------- */
 
 function leerCarrito() {
