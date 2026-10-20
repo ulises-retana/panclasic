@@ -180,6 +180,42 @@ function detalleCompra(PDO $pdo, int $id): array
     return $compra;
 }
 
+function misCompras(PDO $pdo, int $usuarioId): array
+{
+    $stmt = $pdo->prepare(
+        'SELECT id, direccion, metodo_pago, total, creado_en FROM compras
+         WHERE usuario_id = ? ORDER BY id DESC LIMIT ' . MAX_HISTORIAL
+    );
+    $stmt->execute([$usuarioId]);
+    $compras = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if (!$compras) {
+        return [];
+    }
+
+    $ids = array_column($compras, 'id');
+    $marcas = implode(',', array_fill(0, count($ids), '?'));
+    $stmt = $pdo->prepare("SELECT compra_id, nombre, precio, cantidad FROM compras_detalle WHERE compra_id IN ($marcas) ORDER BY id");
+    $stmt->execute($ids);
+
+    $items = [];
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $i) {
+        $items[(int) $i['compra_id']][] = [
+            'nombre' => $i['nombre'],
+            'precio' => (float) $i['precio'],
+            'cantidad' => (int) $i['cantidad'],
+        ];
+    }
+
+    return array_map(fn($c) => [
+        'id' => (int) $c['id'],
+        'direccion' => $c['direccion'],
+        'metodo_pago' => $c['metodo_pago'],
+        'total' => (float) $c['total'],
+        'creado_en' => $c['creado_en'],
+        'items' => $items[(int) $c['id']] ?? [],
+    ], $compras);
+}
+
 $metodo = $_SERVER['REQUEST_METHOD'];
 
 if ($metodo === 'POST') {
@@ -189,6 +225,15 @@ if ($metodo === 'POST') {
 }
 
 if ($metodo === 'GET') {
+    if (isset($_GET['mias'])) {
+        $usuario = usuario_actual();
+        if (!$usuario) {
+            fallar('Debes iniciar sesión', 401);
+        }
+        echo json_encode(misCompras($pdo, (int) $usuario['id']), JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
     requerir_rol('admin');
     if (isset($_GET['id'])) {
         $id = filter_var($_GET['id'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Historial de tus pedidos en Pan Clásico.">
+    <title>Mis Pedidos | Pan Clásico</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+    <header>
+        <nav class="navbar">
+            <div class="logo">🥖 Pan Clásico</div>
+            <ul class="menu">
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="catalogo.html">Catálogo</a></li>
+                <li><a href="contacto.html">Contacto</a></li>
+                <li><a href="login.html">Login</a></li>
+                <li><a href="mis-pedidos.html" class="activo">Mis pedidos</a></li>
+                <li>
+                    <a href="carrito.html" class="nav-cart-link" aria-label="Carrito de compras">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L21 7H6" />
+                            <circle cx="10" cy="20" r="1" />
+                            <circle cx="18" cy="20" r="1" />
+                        </svg>
+                        <span class="cart-badge">0</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="pagina pagina-carrito">
+            <header class="carrito-header">
+                <span class="subtitulo">TU HISTORIAL</span>
+                <h1>Mis Pedidos</h1>
+                <p>Aquí aparecen las compras que hiciste con tu cuenta.</p>
+            </header>
+
+            <div id="pedidos" class="pedidos-lista" aria-live="polite"></div>
+        </section>
+    </main>
+
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">🥖 Pan Clásico</div>
+            <p class="footer-copy">© 2026 Pan Clásico - Tradición y sabor recién horneado cada mañana.</p>
+        </div>
+    </footer>
+
+    <script src="js/utils.js"></script>
+    <script src="js/badge.js"></script>
+    <script src="js/mis-pedidos.js"></script>
+</body>
+
+</html>
