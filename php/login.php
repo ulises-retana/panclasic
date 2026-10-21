@@ -10,6 +10,17 @@ const LIMITE_IP = 20;
 const VENTANA_MINUTOS = 15;
 const HASH_FALSO = '$2y$10$usesomesillystringforeOqVfnCqkSbqgXhS4qZ9Y3xHn6u1G2W';
 
+function ip_cliente(): string
+{
+    if (entorno('CONFIAR_PROXY', '') === '1') {
+        $primera = trim(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '')[0]);
+        if (filter_var($primera, FILTER_VALIDATE_IP)) {
+            return $primera;
+        }
+    }
+    return substr($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0', 0, 45);
+}
+
 function contar_fallos(PDO $pdo, string $condicion, array $parametros): int
 {
     $consulta = $pdo->prepare(
@@ -48,9 +59,9 @@ if (!is_string($email) || !is_string($password) || $email === '' || $password ==
 }
 
 $email = strtolower(trim($email));
-$ip = substr($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0', 0, 45);
+$ip = ip_cliente();
 
-if (contar_fallos($pdo, 'email = ? AND ip = ?', [$email, $ip]) >= LIMITE_CUENTA
+if (contar_fallos($pdo, 'email = ?', [$email]) >= LIMITE_CUENTA
     || contar_fallos($pdo, 'ip = ?', [$ip]) >= LIMITE_IP) {
     fallar('Demasiados intentos. Espera ' . VENTANA_MINUTOS . ' minutos e inténtalo de nuevo', 429);
 }
@@ -67,7 +78,7 @@ if (!$valido) {
     fallar('Correo o contraseña incorrectos', 401);
 }
 
-$pdo->prepare('DELETE FROM intentos_login WHERE email = ? AND ip = ?')->execute([$email, $ip]);
+$pdo->prepare('DELETE FROM intentos_login WHERE email = ?')->execute([$email]);
 
 if (password_needs_rehash($usuario['password_hash'], PASSWORD_DEFAULT)) {
     $pdo->prepare('UPDATE usuarios SET password_hash = ? WHERE id = ?')

@@ -46,7 +46,11 @@ $dsn = sprintf(
 
 try {
     $pdo = new PDO($dsn, entorno('DB_USER', 'root'), entorno('DB_PASS', ''), $opciones);
-} catch (PDOException $e) {
+
+    $zona = entorno('DB_TZ', '-06:00');
+    if (preg_match('/^[+-](0\d|1[0-3]):[0-5]\d$/', $zona)) {
+        $pdo->exec("SET time_zone = '$zona'");
+    }} catch (PDOException $e) {
     error_log($e->getMessage());
     fallar('No se pudo conectar con la base de datos', 500);
 }
