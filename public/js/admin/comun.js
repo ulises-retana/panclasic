@@ -51,9 +51,9 @@ function pintarMenu(usuario) {
   menu.innerHTML = `
     <div class="admin-marca">🥖 Pan Clásico<small>Administración</small></div>
     <nav class="admin-nav">
-     ${SECCIONES.map(([archivo, texto, icono]) =>
-    `<a href="${archivo}"${archivo === actual ? ' class="activo"' : ''}><span>${icono}</span>${texto}</a>`
-  ).join('')}
+      ${SECCIONES.map(([archivo, texto, icono]) =>
+        `<a href="${archivo}"${archivo === actual ? ' class="activo"' : ''}><span>${icono}</span>${texto}</a>`
+      ).join('')}
       <a href="../index.html"><span>🏠</span>Volver al sitio</a>
     </nav>
     <div class="admin-usuario">
@@ -77,7 +77,7 @@ async function iniciarAdmin() {
     return usuario;
   } catch {
     window.location.href = URL_LOGIN;
-    return new Promise(() => { });
+    return new Promise(() => {});
   }
 }
 
