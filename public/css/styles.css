@@ -172,6 +172,7 @@ body > header {
 
 .cuenta {
     position: relative;
+    margin-left: 6px;
 }
 
 .cuenta-btn {

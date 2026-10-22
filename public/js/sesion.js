@@ -77,9 +77,9 @@ function pintarCuenta(usuario) {
   itemCuenta = crear('li', 'cuenta');
   itemCuenta.append(boton, menu);
   itemLogin.hidden = true;
-  itemLogin.after(itemCuenta);
+  document.querySelector('.menu').append(itemCuenta);
 
-  const pedidos = document.querySelector('.menu a[href="mis-pedidos.html"]');
+  const pedidos = document.querySelector('.menu > li > a[href="mis-pedidos.html"]');
   if (admin && pedidos) {
     const a = crear('a', '', 'Admin');
     a.href = 'admin/index.html';
