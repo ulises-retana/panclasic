@@ -163,6 +163,133 @@ body > header {
 }
 
 /* ========================================
+   MENÚ DE CUENTA
+======================================== */
+
+.menu li[hidden] {
+    display: none;
+}
+
+.cuenta {
+    position: relative;
+}
+
+.cuenta-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 248, 237, 0.7);
+    background: linear-gradient(135deg, var(--color-gold) 0%, var(--color-accent) 100%);
+    color: var(--color-cream);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cuenta-btn:hover,
+.cuenta-btn[aria-expanded="true"] {
+    transform: scale(1.06);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+.cuenta-btn:focus-visible,
+.cuenta-opcion:focus-visible {
+    outline: 3px solid var(--color-gold);
+    outline-offset: 2px;
+}
+
+.cuenta-menu {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    min-width: 250px;
+    padding: 8px;
+    background: #ffffff;
+    border: 1px solid var(--color-border);
+    border-top: 4px solid var(--color-accent);
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(68, 36, 21, 0.25);
+    z-index: 1100;
+    text-align: left;
+}
+
+.cuenta-menu[hidden] {
+    display: none;
+}
+
+.cuenta-cabecera {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 10px 12px 12px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.cuenta-nombre {
+    color: var(--color-primary);
+    font-size: 16px;
+    font-weight: 800;
+    word-break: break-word;
+}
+
+.cuenta-correo {
+    color: var(--color-text-muted);
+    font-size: 13px;
+    word-break: break-all;
+}
+
+.cuenta-rol {
+    align-self: flex-start;
+    margin-top: 4px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #fff4e5;
+    color: var(--color-accent-hover);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.menu .cuenta-menu .cuenta-opcion {
+    display: block;
+    width: 100%;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-text);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.menu .cuenta-menu .cuenta-opcion:hover {
+    background: #fff4e5;
+    color: var(--color-primary);
+}
+
+.menu .cuenta-menu .cuenta-salir {
+    margin-top: 4px;
+    border-top: 1px solid var(--color-border-light);
+    border-radius: 0 0 8px 8px;
+    color: #c0392b;
+}
+
+.menu .cuenta-menu .cuenta-salir:hover {
+    background: #fdeeed;
+    color: #962d22;
+}
+
+/* ========================================
    PÁGINA DE INICIO (HERO)
 ======================================== */
 
@@ -1751,6 +1878,11 @@ footer {
         grid-template-columns: 1fr;
         gap: 30px;
         padding: 40px 20px;
+    }
+    .cuenta-menu {
+        right: 50%;
+        transform: translateX(50%);
+        width: min(280px, 90vw);
     }
 }
 
