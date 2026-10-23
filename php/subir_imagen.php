@@ -37,30 +37,37 @@ if ($cloudinary) {
         fallar('Cloudinary no está configurado correctamente', 500);
     }
 
+    $clave = rawurldecode($partes['user']);
+    $secreto = rawurldecode($partes['pass']);
     $marca = time();
-    $firma = sha1("timestamp=$marca" . $partes['pass']);
-    $curl = curl_init("https://api.cloudinary.com/v1_1/{$partes['host']}/image/upload");
+    $firma = sha1("timestamp=$marca" . $secreto);
+
+    $curl = curl_init('https://api.cloudinary.com/v1_1/' . rawurlencode($partes['host']) . '/image/upload');
     curl_setopt_array($curl, [
         CURLOPT_POST => true,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_TIMEOUT => 30,
         CURLOPT_POSTFIELDS => [
             'file' => new CURLFile($archivo['tmp_name'], $tipo, $nombre),
-            'api_key' => $partes['user'],
+            'api_key' => $clave,
             'timestamp' => $marca,
             'signature' => $firma
         ]
     ]);
-    $respuesta = json_decode((string) curl_exec($curl), true);
+    $salida = curl_exec($curl);
+    $errorRed = curl_error($curl);
+    $codigo = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
     curl_close($curl);
+    $respuesta = json_decode((string) $salida, true);
 
     if (empty($respuesta['secure_url'])) {
-        fallar('No se pudo subir la imagen', 502);
+        $motivo = $respuesta['error']['message'] ?? ($errorRed ?: "respuesta HTTP $codigo");
+        error_log('Cloudinary: ' . $motivo);
+        fallar('Cloudinary rechazó la imagen: ' . mb_substr((string) $motivo, 0, 150), 502);
     }
     echo json_encode(['ruta' => $respuesta['secure_url']]);
     exit;
 }
-
 $carpeta = __DIR__ . '/../public/img/productos';
 if (!is_dir($carpeta) && !mkdir($carpeta, 0755, true)) {
     fallar('No se pudo crear la carpeta de imágenes', 500);
