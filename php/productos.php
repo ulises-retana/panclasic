@@ -151,4 +151,28 @@ if ($metodo === 'PUT') {
     exit;
 }
 
+if ($metodo === 'DELETE') {
+    requerir_rol('admin');
+    $id = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+    if ($id === false) {
+        fallar('ID inválido', 400);
+    }
+
+    try {
+        $stmt = $pdo->prepare('DELETE FROM productos WHERE id = ?');
+        $stmt->execute([$id]);
+    } catch (PDOException $e) {
+        if ($e->getCode() === '23000') {
+            fallar('Este producto tiene compras registradas y no se puede eliminar. Desactívalo en su lugar.', 409);
+        }
+        throw $e;
+    }
+    if ($stmt->rowCount() === 0) {
+        fallar('Producto no encontrado', 404);
+    }
+
+    echo json_encode(['ok' => true]);
+    exit;
+}
+
 fallar('Método no permitido', 405);

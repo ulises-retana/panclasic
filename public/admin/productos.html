@@ -99,6 +99,17 @@
     </form>
   </dialog>
 
+    <dialog id="modal-eliminar">
+    <div class="modal-cuerpo">
+      <h2>Eliminar producto</h2>
+      <p>¿Eliminar <strong id="eliminar-nombre"></strong>? Esta acción no se puede deshacer. Las compras que ya lo incluyen conservan su registro.</p>
+      <div class="modal-acciones">
+        <button type="button" class="btn btn-secundario" data-cerrar>Cancelar</button>
+        <button type="button" class="btn btn-peligro" id="confirmar-eliminar">Eliminar</button>
+      </div>
+    </div>
+  </dialog>
+  
   <script src="../js/utils.js"></script>
   <script src="../js/admin/comun.js"></script>
   <script src="../js/admin/productos.js"></script>

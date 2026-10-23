@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS compras (
 CREATE TABLE IF NOT EXISTS compras_detalle (
   id           INT UNSIGNED  NOT NULL AUTO_INCREMENT,
   compra_id    INT UNSIGNED  NOT NULL,
-  producto_id  INT UNSIGNED  NOT NULL,
+  producto_id  INT UNSIGNED  NULL,
   nombre       VARCHAR(100)  NOT NULL,
   precio       DECIMAL(8,2)  NOT NULL,
   cantidad     INT UNSIGNED  NOT NULL,
@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS compras_detalle (
     ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT fk_detalle_producto
     FOREIGN KEY (producto_id) REFERENCES productos (id)
-    ON UPDATE CASCADE ON DELETE RESTRICT,
+    ON UPDATE CASCADE ON DELETE SET NULL,
   CONSTRAINT ck_detalle_cantidad CHECK (cantidad > 0)
 ) ENGINE = InnoDB;
 

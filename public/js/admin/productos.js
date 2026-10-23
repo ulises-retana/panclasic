@@ -99,6 +99,7 @@ function pintarTabla() {
           <div class="acciones">
             <button type="button" class="btn btn-chico btn-secundario" data-accion="editar" data-id="${Number(p.id)}">Editar</button>
             <button type="button" class="btn btn-chico ${activo ? 'btn-peligro' : ''}" data-accion="estado" data-id="${Number(p.id)}">${activo ? 'Desactivar' : 'Activar'}</button>
+            <button type="button" class="btn btn-chico btn-peligro" data-accion="eliminar" data-id="${Number(p.id)}">Eliminar</button>
           </div>
         </td>
       </tr>`;
@@ -185,6 +186,31 @@ async function cambiarEstado(producto) {
   }
 }
 
+const botonEliminar = document.getElementById('confirmar-eliminar');
+let idPorEliminar = null;
+
+function pedirEliminar(producto) {
+  idPorEliminar = Number(producto.id);
+  document.getElementById('eliminar-nombre').textContent = producto.nombre;
+  abrirModal('modal-eliminar');
+}
+
+async function eliminarProducto() {
+  if (!idPorEliminar) return;
+  botonEliminar.disabled = true;
+  try {
+    await api(`productos.php?id=${idPorEliminar}`, { method: 'DELETE' });
+    idPorEliminar = null;
+    cerrarModal('modal-eliminar');
+    mostrarToast('Producto eliminado');
+    await cargarProductos();
+  } catch (err) {
+    mostrarToast(err.message, 'error');
+  } finally {
+    botonEliminar.disabled = false;
+  }
+}
+
 tablaProductos.addEventListener('click', e => {
   const boton = e.target.closest('[data-accion]');
   if (!boton) return;
@@ -192,6 +218,7 @@ tablaProductos.addEventListener('click', e => {
   if (!producto) return;
   if (boton.dataset.accion === 'editar') abrirFormulario(producto);
   if (boton.dataset.accion === 'estado') cambiarEstado(producto);
+  if (boton.dataset.accion === 'eliminar') pedirEliminar(producto);
 });
 
 zonaImagen.addEventListener('click', () => entradaArchivo.click());
@@ -220,4 +247,5 @@ entradaArchivo.addEventListener('change', () => elegirArchivo(entradaArchivo.fil
 
 document.getElementById('btn-nuevo').addEventListener('click', () => abrirFormulario(null));
 formProducto.addEventListener('submit', guardarProducto);
+botonEliminar.addEventListener('click', eliminarProducto);
 adminListo.then(cargarProductos);
