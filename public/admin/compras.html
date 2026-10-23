@@ -13,6 +13,7 @@
   <main class="admin-main">
     <div class="admin-cabecera">
       <h1>Compras</h1>
+      <button type="button" class="btn btn-peligro" id="btn-vaciar">Vaciar historial</button>
     </div>
 
     <div class="tabla-caja">
@@ -24,7 +25,7 @@
             <th>Cliente</th>
             <th>Pago</th>
             <th class="derecha">Total</th>
-            <th class="derecha">Detalle</th>
+            <th class="derecha">Acciones</th>
           </tr>
         </thead>
         <tbody id="tabla-compras"></tbody>
@@ -38,6 +39,28 @@
       <div id="compra-detalle"></div>
       <div class="modal-acciones">
         <button type="button" class="btn btn-secundario" data-cerrar>Cerrar</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="modal-borrar">
+    <div class="modal-cuerpo">
+      <h2>Eliminar compra</h2>
+      <p>¿Eliminar la compra <strong id="borrar-numero"></strong>? Esta acción no se puede deshacer y no devuelve las existencias al inventario.</p>
+      <div class="modal-acciones">
+        <button type="button" class="btn btn-secundario" data-cerrar>Cancelar</button>
+        <button type="button" class="btn btn-peligro" id="confirmar-borrar">Eliminar</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="modal-vaciar">
+    <div class="modal-cuerpo">
+      <h2>Vaciar historial</h2>
+      <p>Se eliminarán <strong id="vaciar-cantidad"></strong> compras, incluidas las que los clientes ven en «Mis pedidos». No se puede deshacer y no devuelve las existencias al inventario.</p>
+      <div class="modal-acciones">
+        <button type="button" class="btn btn-secundario" data-cerrar>Cancelar</button>
+        <button type="button" class="btn btn-peligro" id="confirmar-vaciar">Vaciar todo</button>
       </div>
     </div>
   </dialog>

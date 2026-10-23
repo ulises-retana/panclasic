@@ -1,8 +1,12 @@
-/* compras.js — Admin: historial de compras y ventana con el detalle de cada pedido. Requiere utils.js y comun.js. */
+/* compras.js — Admin: historial de compras, detalle de cada pedido y borrado (una o todas). Requiere utils.js y comun.js. */
 
 const tablaCompras = document.getElementById('tabla-compras');
 const detalleCompra = document.getElementById('compra-detalle');
+const botonVaciar = document.getElementById('btn-vaciar');
+const confirmarBorrar = document.getElementById('confirmar-borrar');
+const confirmarVaciar = document.getElementById('confirmar-vaciar');
 let compras = [];
+let idPorBorrar = null;
 
 async function cargarCompras() {
   try {
@@ -15,6 +19,7 @@ async function cargarCompras() {
 }
 
 function pintarTabla() {
+  botonVaciar.disabled = !compras.length;
   if (!compras.length) {
     tablaCompras.innerHTML = '<tr><td colspan="6" class="admin-vacio">Aún no hay compras.</td></tr>';
     return;
@@ -29,7 +34,8 @@ function pintarTabla() {
       <td class="derecha">${formatearPrecio(c.total)}</td>
       <td>
         <div class="acciones">
-          <button type="button" class="btn btn-chico btn-secundario" data-id="${Number(c.id)}">Ver</button>
+          <button type="button" class="btn btn-chico btn-secundario" data-accion="ver" data-id="${Number(c.id)}">Ver</button>
+          <button type="button" class="btn btn-chico btn-peligro" data-accion="borrar" data-id="${Number(c.id)}">Eliminar</button>
         </div>
       </td>
     </tr>`).join('');
@@ -78,9 +84,54 @@ async function verDetalle(id) {
   }
 }
 
+async function borrarCompra() {
+  if (!idPorBorrar) return;
+  confirmarBorrar.disabled = true;
+  try {
+    await api(`compras.php?id=${idPorBorrar}`, { method: 'DELETE' });
+    idPorBorrar = null;
+    cerrarModal('modal-borrar');
+    mostrarToast('Compra eliminada');
+    await cargarCompras();
+  } catch (err) {
+    mostrarToast(err.message, 'error');
+  } finally {
+    confirmarBorrar.disabled = false;
+  }
+}
+
+async function vaciarHistorial() {
+  confirmarVaciar.disabled = true;
+  try {
+    await api('compras.php?todas=1', { method: 'DELETE' });
+    cerrarModal('modal-vaciar');
+    mostrarToast('Historial eliminado');
+    await cargarCompras();
+  } catch (err) {
+    mostrarToast(err.message, 'error');
+  } finally {
+    confirmarVaciar.disabled = false;
+  }
+}
+
 tablaCompras.addEventListener('click', e => {
-  const boton = e.target.closest('[data-id]');
-  if (boton) verDetalle(Number(boton.dataset.id));
+  const boton = e.target.closest('[data-accion]');
+  if (!boton) return;
+  const id = Number(boton.dataset.id);
+
+  if (boton.dataset.accion === 'ver') verDetalle(id);
+  if (boton.dataset.accion === 'borrar') {
+    idPorBorrar = id;
+    document.getElementById('borrar-numero').textContent = `#${id}`;
+    abrirModal('modal-borrar');
+  }
 });
+
+botonVaciar.addEventListener('click', () => {
+  document.getElementById('vaciar-cantidad').textContent = compras.length;
+  abrirModal('modal-vaciar');
+});
+confirmarBorrar.addEventListener('click', borrarCompra);
+confirmarVaciar.addEventListener('click', vaciarHistorial);
 
 adminListo.then(cargarCompras);

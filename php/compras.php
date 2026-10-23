@@ -171,7 +171,7 @@ function detalleCompra(PDO $pdo, int $id): array
     $stmt->execute([$id]);
     $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
     foreach ($items as &$i) {
-        $i['producto_id'] = (int) $i['producto_id'];
+        $i['producto_id'] = $i['producto_id'] === null ? null : (int) $i['producto_id'];
         $i['precio'] = (float) $i['precio'];
         $i['cantidad'] = (int) $i['cantidad'];
     }
@@ -244,6 +244,30 @@ if ($metodo === 'GET') {
     } else {
         echo json_encode(listarCompras($pdo), JSON_UNESCAPED_UNICODE);
     }
+    exit;
+}
+
+if ($metodo === 'DELETE') {
+    requerir_rol('admin');
+
+    if (isset($_GET['todas'])) {
+        $pdo->exec('DELETE FROM compras');
+        echo json_encode(['ok' => true]);
+        exit;
+    }
+
+    $id = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+    if ($id === false) {
+        fallar('ID inválido', 400);
+    }
+
+    $stmt = $pdo->prepare('DELETE FROM compras WHERE id = ?');
+    $stmt->execute([$id]);
+    if ($stmt->rowCount() === 0) {
+        fallar('Compra no encontrada', 404);
+    }
+
+    echo json_encode(['ok' => true]);
     exit;
 }
 
