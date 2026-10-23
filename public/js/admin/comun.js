@@ -49,7 +49,7 @@ function pintarMenu(usuario) {
 
   const actual = location.pathname.split('/').pop() || 'index.html';
   menu.innerHTML = `
-    <div class="admin-marca">🥖 Pan Clásico<small>Administración</small></div>
+    <div class="admin-marca"><img src="../img/logo-cursiva.png" alt="Pan Clásico" height="40"><small>Administración</small></div>
     <nav class="admin-nav">
       ${SECCIONES.map(([archivo, texto, icono]) =>
         `<a href="${archivo}"${archivo === actual ? ' class="activo"' : ''}><span>${icono}</span>${texto}</a>`
